@@ -1,6 +1,6 @@
 ﻿{
   "id": "86683c73-be28-4380-a014-6316c0404192",
-  "realm": "WeatherShop",
+  "realm": "ADDSManagement",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
@@ -57,7 +57,7 @@
       },
       {
         "id": "f2bd959d-ed9d-4409-af6d-206a4a52cc23",
-        "name": "default-roles-weathershop",
+        "name": "default-roles-addsmanagement",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
@@ -269,7 +269,7 @@
           "attributes": {}
         }
       ],
-      "WeatherWeb": [],
+      "ADDSManagementShell": [],
       "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
@@ -285,7 +285,7 @@
         }
       ],
       "Postman": [],
-      "weather.api": [],
+      "addsmanagement.api": [],
       "account": [
         {
           "id": "b4a01a53-3ed0-4e96-8fd1-efb0c143a45d",
@@ -375,7 +375,7 @@
   "groups": [],
   "defaultRole": {
     "id": "f2bd959d-ed9d-4409-af6d-206a4a52cc23",
-    "name": "default-roles-weathershop",
+    "name": "default-roles-addsmanagement",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
@@ -465,11 +465,11 @@
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
       "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "weather:all", "microprofile-jwt" ]
+      "optionalClientScopes": [ "address", "phone", "offline_access", "addsmanagement:all", "microprofile-jwt" ]
     },
     {
       "id": "016c17d1-8e0f-4a67-9116-86b4691ba99c",
-      "clientId": "WeatherWeb",
+      "clientId": "ADDSManagementShell",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -502,19 +502,19 @@
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
       "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "weather:all", "microprofile-jwt" ]
+      "optionalClientScopes": [ "address", "phone", "offline_access", "addsmanagement:all", "microprofile-jwt" ]
     },
     {
       "id": "65816a45-48d3-4856-b052-c65cb03881d3",
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/WeatherShop/account/",
+      "baseUrl": "/realms/ADDSManagement/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "/realms/WeatherShop/account/*" ],
+      "redirectUris": [ "/realms/ADDSManagement/account/*" ],
       "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
@@ -540,12 +540,12 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/WeatherShop/account/",
+      "baseUrl": "/realms/ADDSManagement/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "/realms/WeatherShop/account/*" ],
+      "redirectUris": [ "/realms/ADDSManagement/account/*" ],
       "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
@@ -669,12 +669,12 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/WeatherShop/console/",
+      "baseUrl": "/admin/ADDSManagement/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "/admin/WeatherShop/console/*" ],
+      "redirectUris": [ "/admin/ADDSManagement/console/*" ],
       "webOrigins": [ "+" ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -716,7 +716,7 @@
     },
     {
       "id": "4b5953fd-b218-41be-b061-58f37c1c7d26",
-      "clientId": "weather.api",
+      "clientId": "addsmanagement.api",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -802,7 +802,7 @@
     },
     {
       "id": "52fc55cb-995e-4aa2-95ae-3b3d6601dc41",
-      "name": "weather:all",
+      "name": "addsmanagement:all",
       "description": "",
       "protocol": "openid-connect",
       "attributes": {
@@ -814,12 +814,12 @@
       "protocolMappers": [
         {
           "id": "06d03e02-1e56-4bde-911d-bcf28aeba90f",
-          "name": "weather api audience",
+          "name": "adds management audience",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
           "consentRequired": false,
           "config": {
-            "included.client.audience": "weather.api",
+            "included.client.audience": "addsmanagement.api",
             "introspection.token.claim": "true",
             "userinfo.token.claim": "false",
             "id.token.claim": "false",
@@ -1324,7 +1324,7 @@
     }
   ],
   "defaultDefaultClientScopes": [ "role_list", "profile", "email", "roles", "web-origins", "acr" ],
-  "defaultOptionalClientScopes": [ "offline_access", "address", "phone", "microprofile-jwt", "weather:all" ],
+  "defaultOptionalClientScopes": [ "offline_access", "address", "phone", "microprofile-jwt", "addsmanagement:all" ],
   "browserSecurityHeaders": {
     "contentSecurityPolicyReportOnly": "",
     "xContentTypeOptions": "nosniff",

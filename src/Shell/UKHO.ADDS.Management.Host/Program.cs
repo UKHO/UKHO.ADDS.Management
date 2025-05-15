@@ -53,11 +53,11 @@ namespace UKHO.ADDS.Management.Host
             var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 
             builder.Services.AddAuthentication(oidcScheme)
-                .AddKeycloakOpenIdConnect("keycloak", realm: "WeatherShop", oidcScheme, options =>
+                .AddKeycloakOpenIdConnect("keycloak", realm: "ADDSManagement", oidcScheme, options =>
                 {
-                    options.ClientId = "WeatherWeb";
+                    options.ClientId = "ADDSManagementShell";
                     options.ResponseType = OpenIdConnectResponseType.Code;
-                    options.Scope.Add("weather:all");
+                    options.Scope.Add("addsmanagement:all");
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
                     options.SaveTokens = true;
