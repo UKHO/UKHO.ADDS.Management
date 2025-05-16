@@ -1,3 +1,5 @@
+using AzureKeyVaultEmulator.Aspire.Hosting;
+using UKHO.ADDS.Management.Configuration;
 using UKHO.ADDS.Management.LocalHost.Extensions;
 
 namespace UKHO.ADDS.Management.LocalHost;
@@ -15,15 +17,34 @@ internal static class Program
             .WithDataVolume()
             .WithRealmImport("./Realms");
 
-        var sqlserver = builder.AddSqlServer("sql-server")
-            .WithVolume("adds-mgmt-sqlserver-data", "/var/opt/mssql")
-            .AddDatabase("adds-management");
+        var cosmos = builder.AddAzureCosmosDB(ServiceNames.CosmosDb).RunAsEmulator(x => x.WithDataVolume());
+        cosmos.AddCosmosDatabase("adds-management");
+
+        var keyVault = builder.AddAzureKeyVaultEmulator(ServiceNames.KeyVault,
+            new KeyVaultEmulatorOptions
+            {
+                Persist = true
+            });
+
+        var storage = builder.AddAzureStorage(ServiceNames.Storage).RunAsEmulator(e => { e.WithDataVolume(); });
+
+        var storageQueue = storage.AddQueues(ServiceNames.Queues);
+        var storageTable = storage.AddTables(ServiceNames.Tables);
+        var storageBlob = storage.AddBlobs(ServiceNames.Blobs);
 
         builder.AddProject<Projects.UKHO_ADDS_Management_Host>("management-shell")
             .WithExternalHttpEndpoints()
             .WithReference(keycloak)
-            .WithReference(sqlserver)
-            .WaitFor(sqlserver)
+            .WithReference(cosmos)
+            .WaitFor(cosmos)
+            .WithReference(keyVault)
+            .WaitFor(keyVault)
+            .WithReference(storageQueue)
+            .WaitFor(storageQueue)
+            .WithReference(storageTable)
+            .WaitFor(storageTable)
+            .WithReference(storageBlob)
+            .WaitFor(storageBlob)
             .WithShell("ADDS Management")
             .WithKeycloakUi(keycloak.GetEndpoint("http"), "Keycloak UI");
 
