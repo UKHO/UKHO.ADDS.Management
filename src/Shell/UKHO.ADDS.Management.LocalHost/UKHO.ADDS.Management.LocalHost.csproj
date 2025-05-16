@@ -22,8 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\mock\UKHO.ADDS.Mocks.Management\UKHO.ADDS.Mocks.Management.csproj" />
     <ProjectReference Include="..\UKHO.ADDS.Management.Host\UKHO.ADDS.Management.Host.csproj" />
-    <ProjectReference Include="..\UKHO.ADDS.Management\UKHO.ADDS.Management.csproj"  IsAspireProjectResource="false"/>
+    <ProjectReference Include="..\UKHO.ADDS.Management\UKHO.ADDS.Management.csproj" IsAspireProjectResource="false" />
   </ItemGroup>
 
   <ItemGroup>

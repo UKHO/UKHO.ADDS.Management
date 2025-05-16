@@ -1,4 +1,5 @@
 using AzureKeyVaultEmulator.Aspire.Hosting;
+using Projects;
 using UKHO.ADDS.Management.Configuration;
 using UKHO.ADDS.Management.LocalHost.Extensions;
 
@@ -31,6 +32,10 @@ internal static class Program
         var storageQueue = storage.AddQueues(ServiceNames.Queues);
         var storageTable = storage.AddTables(ServiceNames.Tables);
         var storageBlob = storage.AddBlobs(ServiceNames.Blobs);
+
+        // ADDS Mock
+        var mockService = builder.AddProject<UKHO_ADDS_Mocks_Management>(ServiceNames.Mocks)
+            .WithMockUi("Mock UI");
 
         builder.AddProject<Projects.UKHO_ADDS_Management_Host>("management-shell")
             .WithExternalHttpEndpoints()
