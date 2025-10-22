@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.5.1" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -12,12 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.2.1" />
-    <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" Version="9.2.1" />
-    <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="9.2.1" />
-    <PackageReference Include="AzureKeyVaultEmulator.Aspire.Hosting" Version="2.3.0" />
-	  <PackageReference Include="Aspire.Hosting.Keycloak" Version="9.2.1-preview.1.25222.1" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.2.1" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.1" />
+    <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" Version="9.5.1" />
+    <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="9.5.1" />
+    <PackageReference Include="AzureKeyVaultEmulator.Aspire.Hosting" Version="2.6.6" />
+	  <PackageReference Include="Aspire.Hosting.Keycloak" Version="9.5.1-preview.1.25502.11" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.5.1" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
   </ItemGroup>
 
