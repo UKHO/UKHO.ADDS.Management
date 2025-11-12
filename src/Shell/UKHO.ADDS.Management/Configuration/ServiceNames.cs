@@ -4,8 +4,6 @@
     {
         public const string Mocks = "adds-mock";
 
-        public const string CosmosDb = "cosmos-db";
-
         public const string KeyVault = "keyvault";
 
         public const string Storage = "storage";

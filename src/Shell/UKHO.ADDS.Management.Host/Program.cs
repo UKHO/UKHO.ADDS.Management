@@ -1,16 +1,13 @@
-using Microsoft.AspNetCore.Components.Server;
-using Radzen;
-using UKHO.ADDS.Management.Host.Shell;
-using UKHO.ADDS.Management.Shell.Services;
-
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authorization;
-using UKHO.ADDS.Management.Host.Extensions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Server;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Radzen;
+using UKHO.ADDS.Management.Host.Extensions;
+using UKHO.ADDS.Management.Host.Shell;
+using UKHO.ADDS.Management.Shell.Services;
 
 namespace UKHO.ADDS.Management.Host
 {
@@ -22,12 +19,10 @@ namespace UKHO.ADDS.Management.Host
 
             builder.AddServiceDefaults();
 
-            builder.Services.AddScoped(sp => {
+            builder.Services.AddScoped(sp =>
+            {
                 var nav = sp.GetRequiredService<NavigationManager>();
-                return new HttpClient
-                {
-                    BaseAddress = new Uri(nav.BaseUri)
-                };
+                return new HttpClient { BaseAddress = new Uri(nav.BaseUri) };
             });
 
             // Add services to the container.
@@ -53,7 +48,7 @@ namespace UKHO.ADDS.Management.Host
             var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 
             builder.Services.AddAuthentication(oidcScheme)
-                .AddKeycloakOpenIdConnect("keycloak", realm: "ADDSManagement", oidcScheme, options =>
+                .AddKeycloakOpenIdConnect("keycloak", "ADDSManagement", oidcScheme, options =>
                 {
                     options.ClientId = "ADDSManagementShell";
                     options.ResponseType = OpenIdConnectResponseType.Code;
@@ -69,10 +64,7 @@ namespace UKHO.ADDS.Management.Host
 
             builder.Services.AddAuthorization();
 
-            builder.Services.Configure<CircuitOptions>(options =>
-            {
-                options.DetailedErrors = true;
-            });
+            builder.Services.Configure<CircuitOptions>(options => { options.DetailedErrors = true; });
 
             var app = builder.Build();
 
@@ -99,7 +91,7 @@ namespace UKHO.ADDS.Management.Host
             app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
             app.MapDefaultEndpoints();
-            
+
             app.Run();
         }
     }

@@ -53,7 +53,8 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 **/Properties/launchSettings.json
-!src/Shell/UKHO.ADDS.Management.LocalHost/Properties/launchSettings.json
+!src/Shell/UKHO.ADDS.Management.AppHost/Properties/launchSettings.json
+!src/Shell/UKHO.ADDS.Management.Host/Properties/launchSettings.json
 
 # External 
 *.zip
