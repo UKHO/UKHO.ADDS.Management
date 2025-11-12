@@ -10,7 +10,7 @@ Scope / Purpose: Same as v0.01. Formatting only.
 The FileShareService.DesktopClient is a .NET 6 Windows desktop (Prism MVVM) application that enables authenticated users (via Azure AD) to search for, download, and administer file batches stored in an external File Share Service (FSS) through admin/client APIs.
 
 ## 2. System Overview (Baseline)
-- Azure AD interactive & silent auth
+- Azure AD interactive & silent authentication
 - Environment selection (environments.json)
 - Query-based batch search (system + user attributes, pagination)
 - Batch detail viewing & file download
