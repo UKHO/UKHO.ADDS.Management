@@ -13,7 +13,7 @@ Ensure newly generated specification versions automatically archive prior versio
 1. Discover existing spec files matching pattern `spec-*_v*.md` in `docs/specs/`.
 2. Parse semantic version suffix `_vX.YY`.
 3. For the spec being updated:
-   - Identify higher newest version number; increment minor for new draft.
+   - Identify highest version number; increment minor for new draft.
    - Move all older versions to archive folder if not already archived.
 4. Create new spec file with updated version, Change Log referencing superseded version.
 5. Update cross-reference sections to only list current versions.
