@@ -9,12 +9,40 @@ A .NET 9 / Blazor (Aspire orchestrated) solution for ADDS Management.
 - Docker Desktop running (containers required for Aspire + Keycloak).
 - Git.
 
-## 2. Clone
+## 2. Clone (includes submodules)
+
+This repository contains Git submodules. Ensure they are initialised.
 
 ```bash
 git clone https://github.com/UKHO/UKHO.ADDS.Management.git
 cd UKHO.ADDS.Management
+# Initialise and fetch all submodules
+git submodule update --init --recursive
 ```
+
+If you have already cloned without submodules, just run:
+```bash
+git submodule update --init --recursive
+```
+When pulling future changes that may affect submodules, you can use:
+```bash
+git pull --recurse-submodules
+```
+
+### 2.a Repoint submodules to latest upstream commits
+To move each submodule to the latest commit on its configured branch:
+```bash
+git submodule update --remote --merge
+```
+Notes:
+- `--remote` fetches latest commits from the submodule's remote.
+- `--merge` merges the fetched commit into the currently checked out submodule branch (fast-forward when possible).
+- Commit the resulting submodule SHA changes in the parent repo:
+```bash
+git add <submodule-paths>
+git commit -m "chore: update submodules to latest remote"
+```
+(Or simply `git add .` if no other unintended changes.)
 
 ## 3. First-time Setup
 
@@ -99,12 +127,17 @@ dotnet dev-certs https --trust
 
 # List running containers
 docker ps
+
+# Update submodules after pulling
+ git submodule update --recursive --remote
 ```
 
 ## 11. Updating / Pulling Changes
 
 ```bash
 git pull origin main
+# Then ensure submodules are current
+git submodule update --init --recursive
 ```
 
 If new dependencies added, rebuild AppHost and re-run.
