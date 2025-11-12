@@ -1,9 +1,9 @@
 using AzureKeyVaultEmulator.Aspire.Hosting;
 using Projects;
+using UKHO.ADDS.Management.AppHost.Extensions;
 using UKHO.ADDS.Management.Configuration;
-using UKHO.ADDS.Management.LocalHost.Extensions;
 
-namespace UKHO.ADDS.Management.LocalHost;
+namespace UKHO.ADDS.Management.AppHost;
 
 internal static class Program
 {
@@ -17,9 +17,6 @@ internal static class Program
         var keycloak = builder.AddKeycloak("keycloak", 8080, username, password)
             .WithDataVolume()
             .WithRealmImport("./Realms");
-
-        var cosmos = builder.AddAzureCosmosDB(ServiceNames.CosmosDb).RunAsEmulator(x => x.WithDataVolume());
-        cosmos.AddCosmosDatabase("adds-management");
 
         var keyVault = builder.AddAzureKeyVaultEmulator(ServiceNames.KeyVault,
             new KeyVaultEmulatorOptions
@@ -40,8 +37,6 @@ internal static class Program
         builder.AddProject<Projects.UKHO_ADDS_Management_Host>("management-shell")
             .WithExternalHttpEndpoints()
             .WithReference(keycloak)
-            .WithReference(cosmos)
-            .WaitFor(cosmos)
             .WithReference(keyVault)
             .WaitFor(keyVault)
             .WithReference(storageQueue)

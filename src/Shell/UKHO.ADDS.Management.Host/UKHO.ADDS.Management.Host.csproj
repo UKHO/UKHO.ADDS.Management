@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UKHO.ADDS.Management.Aspire\UKHO.ADDS.Management.Aspire.csproj" />
+		<ProjectReference Include="..\UKHO.ADDS.Management.ServiceDefaults\UKHO.ADDS.Management.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\UKHO.ADDS.Management.Shell\UKHO.ADDS.Management.Shell.csproj" />
 	</ItemGroup>
 
