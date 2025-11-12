@@ -1,4 +1,3 @@
-using UKHO.ADDS.Management.Shell.Models;
 using UKHO.ADDS.Management.Shell.Modules;
 
 namespace UKHO.ADDS.Management.Shell.Services
