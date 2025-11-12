@@ -1,4 +1,4 @@
-namespace UKHO.ADDS.Management.Shell.Services
+namespace UKHO.ADDS.Management.Shell.Modules
 {
     public class KeyboardShortcut
     {

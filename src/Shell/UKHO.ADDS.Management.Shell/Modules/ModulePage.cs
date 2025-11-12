@@ -1,4 +1,4 @@
-namespace UKHO.ADDS.Management.Shell.Models
+namespace UKHO.ADDS.Management.Shell.Modules
 {
     public class ModulePage
     {
