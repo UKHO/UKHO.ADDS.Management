@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components;
@@ -7,6 +8,8 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Radzen;
 using UKHO.ADDS.Management.Host.Extensions;
 using UKHO.ADDS.Management.Host.Shell;
+using UKHO.ADDS.Management.Modules.Samples;
+using UKHO.ADDS.Management.Modules.Samples.Registration;
 using UKHO.ADDS.Management.Shell.Services;
 
 namespace UKHO.ADDS.Management.Host
@@ -18,6 +21,9 @@ namespace UKHO.ADDS.Management.Host
             var builder = WebApplication.CreateBuilder(args);
 
             builder.AddServiceDefaults();
+
+            // Registers the sample module
+            builder.Services.AddSampleModule();
 
             builder.Services.AddScoped(sp =>
             {
@@ -87,8 +93,13 @@ namespace UKHO.ADDS.Management.Host
 
             app.MapStaticAssets();
 
+            Assembly[] moduleAssemblies = [typeof(SampleModule).Assembly];
+
+            app.MapRazorComponents<App>()
+                .AddInteractiveServerRenderMode()
+                .AddAdditionalAssemblies(moduleAssemblies);
+
             app.MapRazorPages();
-            app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
             app.MapDefaultEndpoints();
 

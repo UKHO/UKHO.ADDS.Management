@@ -1,20 +1,31 @@
 using UKHO.ADDS.Management.Shell.Models;
+using UKHO.ADDS.Management.Shell.Modules;
 
 namespace UKHO.ADDS.Management.Shell.Services
 {
     public class ModulePageService
     {
-        private readonly ModulePage[] _allPages =
+        public ModulePageService(IEnumerable<IModule> modules)
         {
-            new ModulePage { Name = "Services", Path = "/", Icon = "\ue88a" }, new ModulePage
+            _allPages = [];
+
+            foreach (var module in modules)
+            {
+                _allPages.AddRange(module.Pages);
+            }
+
+            _allPages.Add(new ModulePage { Name = "Services", Path = "/", Icon = "\ue88a" });
+            _allPages.Add(new ModulePage
             {
                 Name = "Explorer",
                 Path = "/_dashboard/explorer",
                 Title = "",
                 Description = "",
                 Icon = "\ue0c6"
-            }
-        };
+            });
+        }
+
+        private readonly List<ModulePage> _allPages;
 
         public IEnumerable<ModulePage> Pages => _allPages;
 
