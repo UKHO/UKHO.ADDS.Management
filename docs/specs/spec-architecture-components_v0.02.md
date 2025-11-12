@@ -27,7 +27,7 @@ Cross-Cutting / Shared:
 
 Infrastructure Orchestration:
 - AppHost Program: Defines resources (Keycloak, KeyVault emulator, Storage emulator) and wires dependencies.
-- ResourceBuilderExtensions: Provides convenience commands (WithShell, WithKeycloakUi, WithMockUi) — mock UI command retained only as reference (behavior not detailed).
+- ResourceBuilderExtensions: Provides convenience commands (WithShell, WithKeycloakUi, WithMockUi) â€” mock UI command retained only as reference (behavior not detailed).
 
 4. Detailed Elements
 Dependency Injection Patterns:
