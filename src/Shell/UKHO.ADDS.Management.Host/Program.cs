@@ -93,7 +93,7 @@ namespace UKHO.ADDS.Management.Host
 
             app.MapStaticAssets();
 
-            Assembly[] moduleAssemblies = [typeof(SampleModule).Assembly];
+            Assembly[] moduleAssemblies = [typeof(SamplePage).Assembly];
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode()
