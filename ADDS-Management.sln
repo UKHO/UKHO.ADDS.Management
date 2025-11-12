@@ -27,6 +27,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ADDS.Management.AppHos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ADDS.Management.Modules.Samples", "src\Modules\UKHO.ADDS.Management.Modules.Samples\UKHO.ADDS.Management.Modules.Samples.csproj", "{3D294328-1567-45BB-A054-2F6152D6F02C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@docs", "@docs", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,5 +84,8 @@ Global
 		{462E20E2-FB7A-8FCA-C80E-51D86F20FECE} = {04859EFB-024C-4BB7-9199-C52F22B616F5}
 		{83D13A1A-EBD5-9D43-75B4-9A2EA387EA71} = {04859EFB-024C-4BB7-9199-C52F22B616F5}
 		{3D294328-1567-45BB-A054-2F6152D6F02C} = {C41592FD-8877-4386-A421-543DBFCBB5CC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47B880CB-C6C9-4932-8E6B-C4CDCF5DAB63}
 	EndGlobalSection
 EndGlobal
