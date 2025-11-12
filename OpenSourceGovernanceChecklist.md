@@ -1,6 +1,6 @@
 # Open Source Governance Checklist
 
-## Identifer
+## Identifier
 
 ERP Facade
 
