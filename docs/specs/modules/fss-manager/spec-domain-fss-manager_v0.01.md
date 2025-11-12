@@ -9,7 +9,7 @@ Change Log:
 - Establish baseline for the FSS Manager module: domain intent, extensibility hooks, and current implementation status.
 
 2. Context & Overview
-- Module will integrate into the Shell via IModule pattern.
+- Module will integrate into the Shell via the IModule pattern.
 - Provides management UI for FSS related operations (actual pages/endpoints not yet implemented) (Unverified).
 
 3. Components / Modules
