@@ -123,7 +123,7 @@ If you need to change the `UKHO.ADDS.Management.Host` HTTPS port:
 dotnet dev-certs https --trust
 
 # Clean + Restore
- dotnet clean && dotnet restore
+dotnet clean && dotnet restore
 
 # List running containers
 docker ps
