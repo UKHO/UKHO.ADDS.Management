@@ -1,7 +1,7 @@
 {
     "jobs": [
-      		
-	   {
+       		
+       {
         "action": "newBatch",
         "displayName": "Upload BespokeExchangeSets",
         "actionParams": {
