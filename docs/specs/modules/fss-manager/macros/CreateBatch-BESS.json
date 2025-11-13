@@ -1,0 +1,46 @@
+{
+    "jobs": [
+      		
+	   {
+        "action": "newBatch",
+        "displayName": "Upload BespokeExchangeSets",
+        "actionParams": {
+          "businessUnit": "AVCS-BespokeExchangeSets",
+          "attributes": [
+            {
+              "key": "Product Type",
+              "value": "BESS"
+            },
+            {
+              "key": "Year",
+              "value": "$(now.Year)" 
+            },
+            {
+              "key": "Week Number",
+              "value": "$(now.WeekNumber)" 
+            },
+			{
+              "key": "Year / Week",
+              "value": "$(now.WeekNumber.Year) / $(now.WeekNumber2)"
+			},
+            {
+              "key": "Exchange Set Type",
+              "value": "Bess"
+            }
+          ],
+          "acl": {
+            "readUsers": [],
+            "readGroups": []
+          },
+          "expiryDate": "$(now.AddDays(1))",
+          "files": [
+           {
+              "searchPath": "\\\\business.ukho.gov.uk\\dfs\\Bus_CorpData\\DATA EXCHANGE\\FileShareServiceDesktopClient\\ESS Logs\\ess logs1207.zip",
+              "expectedFileCount": 1,
+              "mimeType": "text/plain"
+            }
+           ]
+          }
+         }
+    ]
+  }
