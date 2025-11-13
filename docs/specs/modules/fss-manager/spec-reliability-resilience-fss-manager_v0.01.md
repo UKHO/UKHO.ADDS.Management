@@ -37,7 +37,7 @@ Define reliability goals, resilience mechanisms (retry, chunking, error isolatio
 
 ## 5. Chunking Strategy
 - Threshold: 32MB triggers chunk streaming pattern.
-- Initial Chunk: 4MB; may increase up to MaxChunk (16MB) based on internal heuristic (simple linear growth or fixed – baseline unspecified; treat as static sizes v0.01).
+- Initial Chunk: 4MB; may increase up to MaxChunk (16MB) based on internal heuristic (simple linear growth or fixed â€” baseline unspecified; treat as static sizes v0.01).
 - No resumable checkpoint; cancellation abandons partial progress.
 
 ## 6. Cancellation Flow
