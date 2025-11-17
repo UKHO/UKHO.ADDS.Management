@@ -1,6 +1,6 @@
 # Functional Specification Document (FSD)
 
-**Project**: ADDS Management Shell � FSS Manager Module  
+**Project**: ADDS Management Shell – FSS Manager Module  
 **Version**: v0.01 (Draft)  
 **Date**: (TBC)  
 **Author**: (TBC)
@@ -145,9 +145,9 @@ Migrate desktop functionality (attribute search, batch detail, unlimited adaptiv
 | DM5 | ErrorRecord | Categorized error surfaced to UI. | Id, Category, Message, Timestamp, CorrelationId |
 
 Relationships:
-- Batch ? Files (1:many)
-- AdminJob / FileTransferJob ? RetryEvent (1:many)
-- Job ? ErrorRecord (1:many)
+- Batch → Files (1:many)
+- AdminJob / FileTransferJob → RetryEvent (1:many)
+- Job → ErrorRecord (1:many)
 
 ---
 ## 8. Deployment Strategy

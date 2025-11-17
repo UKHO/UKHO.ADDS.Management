@@ -1,7 +1,7 @@
 {
     "jobs": [
-      		
-	   {
+       		
+       {
         "action": "newBatch",
         "displayName": "Upload BespokeExchangeSets",
         "actionParams": {
@@ -19,10 +19,10 @@
               "key": "Week Number",
               "value": "$(now.WeekNumber)" 
             },
-			{
+        "actionParams":             {
               "key": "Year / Week",
               "value": "$(now.WeekNumber.Year) / $(now.WeekNumber2)"
-			},
+            },
             {
               "key": "Exchange Set Type",
               "value": "Bess"
