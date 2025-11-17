@@ -1,113 +1,154 @@
-Title: ADDS Management Architecture Components
-Version: v0.02 (Draft)
-Status: Draft / Baseline Extraction (Adjusted Scope)
-Supersedes: spec-architecture-components_v0.01.md
-Change Log:
+# ADDS Management — Architecture Components
+
+**Title:** ADDS Management Architecture Components
+
+**Version:** v0.02 (Draft)
+
+**Status:** Draft / Baseline Extraction (Adjusted Scope)
+
+**Supersedes:** `spec-architecture-components_v0.01.md`
+
+**Change Log:**
 - v0.02: Removed internal ADDS Mock domain/component detail per updated scope.
 
-1. Scope / Purpose
-- Enumerate core architectural components excluding mock internals.
+---
 
-2. Context & Overview
-- Architecture centers on Blazor Server shell, modular extensibility, and Aspire-enabled local infra.
-- Mock services exist but excluded from component internals.
+## 1. Executive Summary
 
-3. Components (In-Scope)
-UI Shell:
-- Program (Host): Auth, OpenAPI, Radzen UI, OutputCache, Blazor server components.
-- Module system: IModule + ModulePage (+ section, keyboard shortcut metadata classes).
-- ModulePageService: Aggregates module pages + static pages (Services, Explorer).
+**Purpose**
+- Enumerate core architectural components for the ADDS Management solution while excluding mock internals.
 
-Extensibility:
-- SampleModule: Example implementation of IModule (singleton) providing a Sample page.
+**Objective**
+- Provide a concise reference for component responsibilities, DI patterns, telemetry, resilience, and orchestration.
 
-Cross-Cutting / Shared:
-- ServiceDefaults (Extensions.cs): OpenTelemetry setup (metrics/tracing), health checks, service discovery, HTTP resilience.
-- ServiceNames: Central service identifiers consumed by AppHost.
+---
 
-Infrastructure Orchestration:
-- AppHost Program: Defines resources (Keycloak, KeyVault emulator, Storage emulator) and wires dependencies.
-- ResourceBuilderExtensions: Provides convenience commands (WithShell, WithKeycloakUi, WithMockUi) — mock UI command retained only as reference (behavior not detailed).
+## 2. Scope / Purpose
 
-4. Detailed Elements
-Dependency Injection Patterns:
-- Singleton: SampleModule (IModule).
-- Scoped: ModulePageService.
-- Transient: AuthorizationHandler.
-- Scoped HttpClient (per navigation base address) for Host.
+**In scope**
+- Blazor Server shell and module system
+- Cross-cutting `ServiceDefaults`
+- `AppHost` orchestration resources
 
-Routing & Composition:
-- AppRouter includes AdditionalAssemblies for module discovery.
-- Authentication endpoints grouped under /authentication.
+**Out of scope**
+- Mock service internal components and domain details
 
-Resilience & Telemetry:
-- Standard resilience handler automatically applied to HttpClient.
-- OpenTelemetry instrumentation: AspNetCore, HttpClient, Runtime metrics; traces for AspNetCore + HttpClient + source.
-- Conditional OTLP exporter via environment variable.
+---
 
-Security:
-- OIDC (Keycloak): ClientId ADDSManagementShell; code flow; scope addsmanagement:all; tokens saved; cookie sign-in scheme.
-- Authorization registration without custom policies (gap).
-- AuthorizationHandler adds bearer token to outgoing HttpClient requests.
+## 3. System Overview
 
-Configuration & Parameters:
-- AppHost uses builder.AddParameter for Keycloak credentials.
-- ServiceNames constants unify resource naming.
+**Context**
+- Architecture centers on a modular Blazor Server shell, local orchestration via Aspire (AppHost), and cross-cutting service defaults.
 
-Health:
-- Health checks mapped in development (/health, /alive) via MapDefaultEndpoints.
+**Core capabilities**
+- Modular page injection via `IModule`
+- Centralized telemetry and resilience defaults
+- Local resource orchestration for development
 
-5. Cross-Cutting Concerns
-Logging:
-- Standard Microsoft logging + OpenTelemetry exporter; no explicit Serilog in in-scope components.
-Error Handling:
-- No centralized exception middleware (gap).
-Caching:
-- OutputCache enabled; no policies enumerated (gap).
-Serialization:
-- Default JSON (no custom source generation) (gap).
-Security:
-- Authentication configured; fine-grained authorization unspecified.
-Accessibility:
-- Not addressed (gap).
-Configuration Hygiene:
-- Central constants; deeper environment layering unverified.
+---
 
-6. Non-Functional Characteristics
-- Observability: Telemetry + metrics baseline.
-- Reliability: Health checks for readiness/liveness in dev.
-- Maintainability: Modular page injection via IModule promotes separation.
-- Scalability: Aspire orchestrates resources; production scale strategy unspecified.
+## 4. Components (Summary)
 
-7. Gaps & Unknowns
-- Lack of tests (unit/integration) for module system or auth pipeline.
-- Absent error handling and authorization policies.
-- OutputCache & resilience configuration not tuned/documented.
-- No accessibility or localization strategy in shell.
-- No configuration validation pattern (e.g., options validation) observed.
+- UI Shell Program: Host responsibilities include auth, OpenAPI, Radzen UI, OutputCache, Blazor server components
+- Module system: `IModule`, `ModulePage`, `ModulePageSection`, keyboard shortcut metadata
+- `ModulePageService`: Aggregates module pages and static pages (`Services`, `Explorer`)
+- SampleModule: Example `IModule` implementation (singleton)
+- `ServiceDefaults`: OpenTelemetry, health checks, service discovery, HTTP resilience
+- `ServiceNames`: Central service identifiers consumed by `AppHost`
+- `AppHost` Program: Resource definitions for Keycloak, KeyVault emulator, Storage emulator
+- `ResourceBuilderExtensions`: Convenience commands (`WithShell`, `WithKeycloakUi`, `WithMockUi`) — mock UI retained as reference only
 
-8. Future Indicators
-- No TODO markers in in-scope files.
+---
 
-9. Traceability (Representative)
-- Auth & Program: src/Shell/UKHO.ADDS.Management.Host/Program.cs
-- Auth endpoints: src/Shell/UKHO.ADDS.Management.Host/Extensions/LoginLogoutEndpointRouteBuilderExtensions.cs
-- AuthorizationHandler: src/Shell/UKHO.ADDS.Management.Host/Extensions/AuthorizationHandler.cs
-- Module abstractions: src/Shell/UKHO.ADDS.Management.Shell/Modules/*.cs
-- Module service: src/Shell/UKHO.ADDS.Management.Shell/Services/ModulePageService.cs
-- Sample module: src/Modules/UKHO.ADDS.Management.Modules.Samples/*.cs
-- Service defaults: src/Shell/UKHO.ADDS.Management.ServiceDefaults/Extensions.cs
-- AppHost orchestration: src/Shell/UKHO.ADDS.Management.AppHost/Program.cs
-- Resource commands: src/Shell/UKHO.ADDS.Management.AppHost/Extensions/ResourceBuilderExtensions.cs
+## 5. Detailed Elements
 
-10. Cross-References
-- System overview spec v0.02 for holistic context.
-- API functional spec v0.02 for endpoints.
-- Frontend functional spec v0.02 for component inventory.
-- Infra deployment spec v0.02 for resource details.
+**Dependency Injection patterns**
+- Singleton: `SampleModule` (implements `IModule`)
+- Scoped: `ModulePageService`
+- Transient: `AuthorizationHandler`
+- Scoped `HttpClient` instances per navigation base address for the host
 
-11. Completion Checklist
-- Mock internals excluded.
-- Gaps recorded.
+**Routing & composition**
+- `AppRouter` configured with `AdditionalAssemblies` for module discovery
+- Authentication endpoints grouped under `/authentication`
 
-End of Document.
+**Resilience & telemetry**
+- Resilience handler applied to `HttpClient`
+- OpenTelemetry: AspNetCore, HttpClient, runtime metrics, and conditional OTLP exporter
+
+**Security**
+- OIDC via Keycloak: client id `ADDSManagementShell`, authorization code flow, scope `addsmanagement:all`
+- Authorization registration present but no policies defined (gap)
+- `AuthorizationHandler` adds bearer token for outgoing requests
+
+**Configuration & parameters**
+- `AppHost` uses `builder.AddParameter` for Keycloak credentials
+- `ServiceNames` constants used across app and AppHost
+
+**Health**
+- Health checks mapped in development (`/health`, `/alive`) via MapDefaultEndpoints
+
+---
+
+## 6. Cross-Cutting Concerns
+
+- Logging: Microsoft logging with OpenTelemetry exporter
+- Error handling: Default pipeline (no centralized middleware)
+- Caching: `OutputCache` enabled; policies unverified
+- Serialization: Default JSON serializer (no source-gen)
+- Security: Authentication configured; fine-grained authorization unspecified
+- Accessibility: Not addressed
+- Configuration hygiene: Central constants exist; validation patterns unverified
+
+---
+
+## 7. Non-Functional Characteristics
+
+- Observability: Telemetry baseline via `ServiceDefaults`
+- Reliability: Readiness/liveness health checks in Development
+- Maintainability: Module abstraction encourages separation
+- Scalability: Aspire facilitates local composition; production scaling not documented
+
+---
+
+## 8. Gaps & Unknowns
+
+- Missing tests for module system and auth pipeline
+- Absent error handling middleware and authorization policies
+- OutputCache and resilience configuration not tuned or documented
+- No accessibility or localization strategy
+- No options validation pattern observed
+
+---
+
+## 9. Traceability
+
+- Auth & Program: `src/Shell/UKHO.ADDS.Management.Host/Program.cs`
+- Auth endpoints: `src/Shell/UKHO.ADDS.Management.Host/Extensions/LoginLogoutEndpointRouteBuilderExtensions.cs`
+- `AuthorizationHandler`: `src/Shell/UKHO.ADDS.Management.Host/Extensions/AuthorizationHandler.cs`
+- Module abstractions: `src/Shell/UKHO.ADDS.Management.Shell/Modules/*.cs`
+- Module service: `src/Shell/UKHO.ADDS.Management.Shell/Services/ModulePageService.cs`
+- Sample module: `src/Modules/UKHO.ADDS.Management.Modules.Samples/*.cs`
+- Service defaults: `src/Shell/UKHO.ADDS.Management.ServiceDefaults/Extensions.cs`
+- AppHost orchestration: `src/Shell/UKHO.ADDS.Management.AppHost/Program.cs`
+- Resource commands: `src/Shell/UKHO.ADDS.Management.AppHost/Extensions/ResourceBuilderExtensions.cs`
+
+---
+
+## 10. Cross-References
+
+- `spec-system-overview_v0.02.md`
+- `spec-api-functional_v0.02.md`
+- `spec-frontend-functional_v0.02.md`
+- `spec-infra-deployment_v0.02.md`
+
+---
+
+## 11. Completion Checklist
+
+- Mock internals excluded
+- Gaps recorded
+
+---
+
+_End of Document._
