@@ -1,69 +1,129 @@
-Title: ADDS Management API Functional Specification
-Version: v0.02 (Draft)
-Status: Draft / Baseline Extraction (Adjusted Scope)
-Supersedes: spec-api-functional_v0.01.md
-Change Log:
+# ADDS Management — API Functional Specification
+
+**Title:** ADDS Management API Functional Specification
+
+**Version:** v0.02 (Draft)
+
+**Status:** Draft / Baseline Extraction (Adjusted Scope)
+
+**Supersedes:** `spec-api-functional_v0.01.md`
+
+**Change Log:**
 - v0.02: Removed detailed mock endpoint catalog; retained only in-scope host endpoints.
 
-1. Scope / Purpose
-- Enumerate host (management shell) API endpoints and high-level infra endpoints; exclude mock endpoints.
+---
 
-2. Context & Overview
-- Host implements authentication and health endpoints.
-- OpenAPI added (development environment); exposes host endpoints only.
+## 1. Executive Summary
 
-3. Components / Modules (API Exposure In-Scope)
-- Authentication group: /authentication/login, /authentication/logout.
-- Health checks (development): /health, /alive.
+Purpose
+- Enumerate the management host API surface and in-scope infra endpoints for the ADDS Management solution (mock endpoints excluded from this version).
 
-4. Detailed Elements (Endpoints)
-Authentication:
-- GET /authentication/login -> OIDC challenge (RedirectUri "/").
-- GET /authentication/logout -> Cookie + OIDC sign-out (RedirectUri "/").
-- POST /authentication/logout -> Same sign-out sequence.
+Objective
+- Provide clear reference for authentication and health endpoints used by the Blazor host and local orchestration.
 
-Health:
-- GET /health -> Aggregated readiness checks (development only).
-- GET /alive -> Liveness check tagged with "live" (development only).
+---
 
-Supporting Structures:
-- AuthorizationHandler: Injects bearer token into outgoing HttpClient requests for authenticated users.
+## 2. Scope / Purpose
 
-5. Cross-Cutting API Concerns
-- Authentication: OIDC Code flow with Keycloak; scope addsmanagement:all.
-- Authorization: Registered but no explicit policies (role/claim enforcement gap).
-- Versioning: None (gap).
-- Validation: Not applicable (endpoints are infrastructural/auth).
-- Error Handling: Relies on default pipeline.
-- Documentation: OpenAPI available in development; no custom descriptions applied to auth routes.
+In scope
+- Host authentication endpoints
+- Host health endpoints (development)
 
-6. Non-Functional Characteristics
-- Security: Standard OIDC challenge/SignOut patterns.
-- Reliability: Health endpoints provide readiness & liveness (development only).
-- Observability: Telemetry instrumentation via ServiceDefaults.
+Out of scope
+- Mock service endpoints and their internal contracts
 
-7. Gaps & Unknowns
-- Lack of versioning strategy.
-- Missing authorization policies / role mapping.
-- No standardized error model.
-- No explicit rate limiting.
+---
 
-8. Future Indicators
-- No TODO markers related to host API.
+## 3. System Overview
 
-9. Traceability
-- Auth endpoints: src/Shell/UKHO.ADDS.Management.Host/Extensions/LoginLogoutEndpointRouteBuilderExtensions.cs
-- Auth configuration: src/Shell/UKHO.ADDS.Management.Host/Program.cs
-- AuthorizationHandler: src/Shell/UKHO.ADDS.Management.Host/Extensions/AuthorizationHandler.cs
-- Health mapping: src/Shell/UKHO.ADDS.Management.ServiceDefaults/Extensions.cs
+Context
+- Host exposes authentication and health endpoints.
+- OpenAPI UI available in Development to document host endpoints.
 
-10. Cross-References
-- System overview v0.02.
-- Architecture components v0.02.
+Core capabilities
+- Provide OIDC integration for user authentication
+- Surface health checks for local development and orchestration
 
-11. Completion Checklist
-- Host endpoints enumerated.
-- Mock endpoints excluded per scope change.
-- Gaps identified.
+---
 
-End of Document.
+## 4. Public API Surface (In-scope)
+
+Authentication
+- `GET /authentication/login` ? Initiates OIDC challenge (redirectUri "/")
+- `GET /authentication/logout` ? Signs out cookie + OIDC (redirectUri "/")
+- `POST /authentication/logout` ? Same sign-out sequence
+
+Health
+- `GET /health` ? Aggregated readiness checks (Development only)
+- `GET /alive` ? Liveness check (tagged "live", Development only)
+
+Supporting structures
+- `AuthorizationHandler` ? Injects bearer token into outgoing `HttpClient` requests for authenticated users
+
+---
+
+## 5. Detailed Elements
+
+Authentication flow
+- Uses OIDC authorization code flow with Keycloak
+- Scope: `addsmanagement:all` referenced (role/claim strategy not documented)
+
+Health checks
+- Implemented via `ServiceDefaults` health registration
+- Exposed only in Development environment
+
+---
+
+## 6. Cross-Cutting API Concerns
+
+- Authentication: Keycloak OIDC + cookie authentication
+- Authorization: No explicit policies registered (gap)
+- Versioning: No API versioning implemented (gap)
+- Validation: Not applicable for infra endpoints
+- Error handling: Default ASP.NET Core pipeline
+- Documentation: OpenAPI available in Development (no custom descriptions for auth routes)
+
+---
+
+## 7. Non-Functional Characteristics
+
+- Security: OIDC challenge and sign-out flows used
+- Reliability: Health endpoints for readiness and liveness in Development
+- Observability: Telemetry via `ServiceDefaults`
+
+---
+
+## 8. Gaps & Unknowns
+
+- No API versioning strategy
+- Missing authorization policy definitions and role mapping
+- No standardized error response model
+- No rate-limiting strategy
+
+---
+
+## 9. Traceability
+
+- Auth endpoints: `src/Shell/UKHO.ADDS.Management.Host/Extensions/LoginLogoutEndpointRouteBuilderExtensions.cs`
+- Auth configuration: `src/Shell/UKHO.ADDS.Management.Host/Program.cs`
+- AuthorizationHandler: `src/Shell/UKHO.ADDS.Management.Host/Extensions/AuthorizationHandler.cs`
+- Health mapping: `src/Shell/UKHO.ADDS.Management.ServiceDefaults/Extensions.cs`
+
+---
+
+## 10. Cross-References
+
+- `spec-system-overview_v0.02.md`
+- `spec-architecture-components_v0.02.md`
+
+---
+
+## 11. Completion Checklist
+
+- Host endpoints enumerated
+- Mock endpoints excluded
+- Gaps identified
+
+---
+
+_End of Document._
