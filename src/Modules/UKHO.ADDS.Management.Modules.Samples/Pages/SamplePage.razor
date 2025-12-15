@@ -1,9 +1,53 @@
 ﻿@page "/sample/main"
+@using UKHO.ADDS.Management.Shell.Models
+@using UKHO.ADDS.Management.Shell.Services
+@using UKHO.ADDS.Management.Shell.Configuration
+@using UKHO.ADDS.Management.Modules.Samples.Configuration
+@using UKHO.ADDS.Management.Shell.Components
+@inject DeploymentsJsonLoader DeploymentsLoader
+@inject IModuleConfigurationProvider ConfigurationProvider
 
-<div class="my-component">
-    This component is defined in the <strong>UKHO.ADDS.Management.Modules.Samples</strong> library.
+<h3>@displayName</h3>
+
+<div>
+    <DeploymentSelector Deployments="deployments" SelectedDeploymentId="selectedId" SelectedDeploymentIdChanged="OnDeploymentChanged" />
 </div>
 
-@code 
-{
+<div>
+    <p>BaseUrl: @baseUrl</p>
+    <p>TimeoutSeconds: @timeoutSeconds</p>
+</div>
+
+@code {
+    private IEnumerable<DeploymentRef> deployments = Enumerable.Empty<DeploymentRef>();
+    private string selectedId = string.Empty;
+    private string displayName = "Sample Module";
+    private string baseUrl = string.Empty;
+    private int timeoutSeconds = 0;
+    private const string moduleId = "Samples";
+
+    protected override async Task OnInitializedAsync()
+    {
+        deployments = await DeploymentsLoader.LoadForModuleAsync("UKHO.ADDS.Management.Modules.Samples");
+        if (deployments.Any())
+        {
+            selectedId = deployments.First().Id;
+            await BindOptions();
+        }
+    }
+
+    private async Task OnDeploymentChanged(string id)
+    {
+        selectedId = id;
+        await BindOptions();
+    }
+
+    private Task BindOptions()
+    {
+        var options = ConfigurationProvider.GetOptions<SampleModuleOptions>(selectedId, moduleId);
+        displayName = options.DisplayName ?? "Sample Module";
+        baseUrl = options.BaseUrl ?? string.Empty;
+        timeoutSeconds = options.TimeoutSeconds;
+        return Task.CompletedTask;
+    }
 }

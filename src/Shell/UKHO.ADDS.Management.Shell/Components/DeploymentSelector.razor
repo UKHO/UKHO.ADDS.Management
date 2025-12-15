@@ -1,0 +1,34 @@
+@using UKHO.ADDS.Management.Shell.Models
+@using Microsoft.AspNetCore.Components
+
+<select @onchange="OnChange" class="deployment-selector">
+    @if (Deployments is null || !Deployments.Any())
+    {
+        <option disabled>No deployments</option>
+    }
+    else
+    {
+        @foreach (var d in Deployments)
+        {
+            <option value="@d.Id" selected="@(d.Id == SelectedDeploymentId)">@d.Description</option>
+        }
+    }
+</select>
+
+@code {
+    [Parameter]
+    public IEnumerable<DeploymentRef>? Deployments { get; set; }
+
+    [Parameter]
+    public string? SelectedDeploymentId { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SelectedDeploymentIdChanged { get; set; }
+
+    private async Task OnChange(ChangeEventArgs args)
+    {
+        var value = args?.Value?.ToString() ?? string.Empty;
+        SelectedDeploymentId = value;
+        await SelectedDeploymentIdChanged.InvokeAsync(value);
+    }
+}

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
@@ -17,6 +17,16 @@
 		<ProjectReference Include="..\..\Modules\UKHO.ADDS.Management.Modules.Samples\UKHO.ADDS.Management.Modules.Samples.csproj" />
 		<ProjectReference Include="..\UKHO.ADDS.Management.ServiceDefaults\UKHO.ADDS.Management.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\UKHO.ADDS.Management.Shell\UKHO.ADDS.Management.Shell.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="configuration.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 </Project>

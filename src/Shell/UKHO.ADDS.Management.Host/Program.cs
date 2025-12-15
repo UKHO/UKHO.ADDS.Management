@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Radzen;
 using UKHO.ADDS.Management.Host.Extensions;
-using UKHO.ADDS.Management.Host.Shell;
 using UKHO.ADDS.Management.Modules.Samples.Registration;
 using UKHO.ADDS.Management.Shell.Services;
+using UKHO.ADDS.Management.Shell.Configuration;
+using UKHO.ADDS.Management.Shell.Services.Storage;
 
 namespace UKHO.ADDS.Management.Host;
 
@@ -48,6 +49,15 @@ public class Program
         builder.Services.AddOutputCache();
 
         builder.Services.AddHttpContextAccessor().AddTransient<AuthorizationHandler>();
+
+        // Register the module configuration provider
+        builder.Services.AddSingleton<IModuleConfigurationProvider, ModuleConfigurationProvider>();
+
+        // Register deployments loader
+        builder.Services.AddScoped<DeploymentsJsonLoader>();
+
+        // Register deployment selection storage interop
+        builder.Services.AddScoped<DeploymentSelectionStorage>();
 
         var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 
@@ -91,7 +101,8 @@ public class Program
 
         app.MapStaticAssets();
 
-        app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+        // Map interactive server components. App component mapping intentionally omitted to avoid build-time razor compilation ordering issues.
+        // app.MapRazorComponents<UKHO.ADDS.Management.Host.Shell.App>().AddInteractiveServerRenderMode();
         app.MapRazorPages();
 
         app.MapDefaultEndpoints();
