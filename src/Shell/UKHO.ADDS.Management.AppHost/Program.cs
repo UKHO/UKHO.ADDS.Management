@@ -21,7 +21,7 @@ internal static class Program
         var keyVault = builder.AddAzureKeyVaultEmulator(ServiceNames.KeyVault,
             new KeyVaultEmulatorOptions
             {
-                Persist = true
+                Persist = false
             });
 
         var storage = builder.AddAzureStorage(ServiceNames.Storage).RunAsEmulator(e => { e.WithDataVolume(); });

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Radzen;
 using UKHO.ADDS.Management.Host.Extensions;
+using UKHO.ADDS.Management.Host.Shell; // App component
 using UKHO.ADDS.Management.Modules.Samples.Registration;
 using UKHO.ADDS.Management.Shell.Services;
 using UKHO.ADDS.Management.Shell.Configuration;
@@ -101,8 +102,8 @@ public class Program
 
         app.MapStaticAssets();
 
-        // Map interactive server components. App component mapping intentionally omitted to avoid build-time razor compilation ordering issues.
-        // app.MapRazorComponents<UKHO.ADDS.Management.Host.Shell.App>().AddInteractiveServerRenderMode();
+        // Map interactive server components.
+        app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
         app.MapRazorPages();
 
         app.MapDefaultEndpoints();
