@@ -4,19 +4,28 @@
 @using UKHO.ADDS.Management.Shell.Configuration
 @using UKHO.ADDS.Management.Modules.Samples.Configuration
 @using UKHO.ADDS.Management.Shell.Components
+@using UKHO.ADDS.Management.Shell.Services.Storage
 @inject DeploymentsJsonLoader DeploymentsLoader
 @inject IModuleConfigurationProvider ConfigurationProvider
+@inject DeploymentSelectionStorage SelectionStorage
 
 <h3>@displayName</h3>
 
-<div>
-    <DeploymentSelector Deployments="deployments" SelectedDeploymentId="selectedId" SelectedDeploymentIdChanged="OnDeploymentChanged" />
-</div>
+@if (!string.IsNullOrWhiteSpace(loadError))
+{
+    <div class="alert alert-danger">@loadError</div>
+}
+else
+{
+    <div>
+        <DeploymentSelector Deployments="deployments" SelectedDeploymentId="selectedId" SelectedDeploymentIdChanged="OnDeploymentChanged" />
+    </div>
 
-<div>
-    <p>BaseUrl: @baseUrl</p>
-    <p>TimeoutSeconds: @timeoutSeconds</p>
-</div>
+    <div>
+        <p>BaseUrl: @baseUrl</p>
+        <p>TimeoutSeconds: @timeoutSeconds</p>
+    </div>
+}
 
 @code {
     private IEnumerable<DeploymentRef> deployments = Enumerable.Empty<DeploymentRef>();
@@ -25,13 +34,29 @@
     private string baseUrl = string.Empty;
     private int timeoutSeconds = 0;
     private const string moduleId = "Samples";
+    private string loadError = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        deployments = await DeploymentsLoader.LoadForModuleAsync("UKHO.ADDS.Management.Modules.Samples");
+        var result = await DeploymentsLoader.LoadForModuleAsync("UKHO.ADDS.Management.Modules.Samples");
+        if (result.HasError)
+        {
+            loadError = result.ErrorMessage ?? "Failed to load deployments";
+            return;
+        }
+        deployments = result.Items;
         if (deployments.Any())
         {
-            selectedId = deployments.First().Id;
+            var stored = await SelectionStorage.GetAsync(moduleId);
+            if (!string.IsNullOrWhiteSpace(stored) && deployments.Any(d => d.Id == stored))
+            {
+                selectedId = stored!;
+            }
+            else
+            {
+                selectedId = deployments.First().Id;
+                await SelectionStorage.SetAsync(moduleId, selectedId);
+            }
             await BindOptions();
         }
     }
@@ -39,6 +64,7 @@
     private async Task OnDeploymentChanged(string id)
     {
         selectedId = id;
+        await SelectionStorage.SetAsync(moduleId, selectedId);
         await BindOptions();
     }
 

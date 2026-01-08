@@ -1,4 +1,10 @@
 [
-  { "id": "dev", "description": "Development" },
-  { "id": "prod", "description": "Production" }
+  {
+    "id": "dev",
+    "description": "Development deployment used during iterative module testing."
+  },
+  {
+    "id": "prod",
+    "description": "Production deployment representing the live baseline configuration."
+  }
 ]

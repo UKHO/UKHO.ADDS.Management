@@ -13,14 +13,12 @@ namespace UKHO.ADDS.Management.Shell.Services.Storage
 
         public ValueTask SetAsync(string moduleId, string deploymentId)
         {
-            var key = StorageKey(moduleId);
-            return js.InvokeVoidAsync("localStorage.setItem", key, deploymentId);
+            return js.InvokeVoidAsync("adds.deploymentSelection.set", moduleId, deploymentId);
         }
 
         public ValueTask<string?> GetAsync(string moduleId)
         {
-            var key = StorageKey(moduleId);
-            return js.InvokeAsync<string?>("localStorage.getItem", key);
+            return js.InvokeAsync<string?>("adds.deploymentSelection.get", moduleId);
         }
 
         private static string StorageKey(string moduleId) => $"adds:module:{moduleId}:deployment";

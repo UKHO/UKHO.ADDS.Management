@@ -1,19 +1,23 @@
 @using UKHO.ADDS.Management.Shell.Models
 @using Microsoft.AspNetCore.Components
 
-<select @onchange="OnChange" class="deployment-selector">
-    @if (Deployments is null || !Deployments.Any())
-    {
-        <option disabled>No deployments</option>
-    }
-    else
-    {
-        @foreach (var d in Deployments)
-        {
-            <option value="@d.Id" selected="@(d.Id == SelectedDeploymentId)">@d.Description</option>
-        }
-    }
-</select>
+@if (Deployments is null || !Deployments.Any())
+{
+    <RadzenDropDown TValue="string"
+                    Data="Array.Empty<DeploymentRef>()"
+                    Placeholder="No deployments"
+                    Style="width: 20rem" />
+}
+else
+{
+    <RadzenDropDown TValue="string"
+                    Data="Deployments"
+                    TextProperty="Description"
+                    ValueProperty="Id"
+                    Value="SelectedDeploymentId"
+                    Change="OnChange"
+                    Style="width: 20rem" />
+}
 
 @code {
     [Parameter]
@@ -25,10 +29,10 @@
     [Parameter]
     public EventCallback<string> SelectedDeploymentIdChanged { get; set; }
 
-    private async Task OnChange(ChangeEventArgs args)
+    private async Task OnChange(object? value)
     {
-        var value = args?.Value?.ToString() ?? string.Empty;
-        SelectedDeploymentId = value;
-        await SelectedDeploymentIdChanged.InvokeAsync(value);
+        var id = value?.ToString() ?? string.Empty;
+        SelectedDeploymentId = id;
+        await SelectedDeploymentIdChanged.InvokeAsync(id);
     }
 }

@@ -20,27 +20,40 @@ namespace UKHO.ADDS.Management.Shell.Services
             this.logger = logger;
         }
 
-        public async Task<IEnumerable<DeploymentRef>> LoadForModuleAsync(string moduleName)
+        public async Task<DeploymentsLoadResult> LoadForModuleAsync(string moduleProjectFolder)
         {
             try
             {
-                // Assume deployments.json is at modules folder under project root for simplicity
                 var basePath = env.ContentRootPath;
-                var path = Path.Combine(basePath, "src", "Modules", moduleName, "deployments.json");
+                var path = Path.Combine(basePath, "src", "Modules", moduleProjectFolder, "deployments.json");
                 if (!File.Exists(path))
                 {
-                    logger.LogWarning("deployments.json not found for module {Module} at {Path}", moduleName, path);
-                    return Enumerable.Empty<DeploymentRef>();
+                    var msg = $"deployments.json not found for module {moduleProjectFolder} at {path}";
+                    logger.LogWarning(msg);
+                    return DeploymentsLoadResult.Error(msg);
                 }
 
                 using var stream = File.OpenRead(path);
                 var items = await JsonSerializer.DeserializeAsync<List<DeploymentRef>>(stream) ?? new List<DeploymentRef>();
-                return items;
+                if (items.Count == 0)
+                {
+                    var msg = $"deployments.json is empty for module {moduleProjectFolder}";
+                    logger.LogWarning(msg);
+                    return DeploymentsLoadResult.Error(msg);
+                }
+                return DeploymentsLoadResult.Success(items);
+            }
+            catch (JsonException jex)
+            {
+                var msg = $"Invalid JSON in deployments.json for module {moduleProjectFolder}: {jex.Message}";
+                logger.LogError(jex, msg);
+                return DeploymentsLoadResult.Error(msg);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error loading deployments.json for module {Module}", moduleName);
-                return Enumerable.Empty<DeploymentRef>();
+                var msg = $"Error loading deployments.json for module {moduleProjectFolder}: {ex.Message}";
+                logger.LogError(ex, msg);
+                return DeploymentsLoadResult.Error(msg);
             }
         }
     }

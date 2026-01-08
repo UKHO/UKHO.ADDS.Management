@@ -14,4 +14,10 @@
     <ProjectReference Include="..\..\Shell\UKHO.ADDS.Management.Shell\UKHO.ADDS.Management.Shell.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="deployments.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

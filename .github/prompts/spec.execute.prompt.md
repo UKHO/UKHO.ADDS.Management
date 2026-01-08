@@ -10,15 +10,16 @@ Workflow Per Work Item / Task / Step:
 1. Locate the next incomplete item in the plan (top-down order).
 2. Analyze its intent, related specs, and any dependencies.
 3. Gather necessary context from the repository using available tools (search, open files, project listing) – be efficient.
-4. If implementing logic: (a) write/modify tests first (TDD) where feasible; (b) implement code to satisfy tests and specs; (c) ensure error handling, logging, docs/comments.
+4. If implementing logic: (a) write/modify tests first (TDD) where feasible; (b) implement code to satisfy tests and specs; (c) ensure error handling, logging, docs/comments).
 5. Add/adjust imports, dependencies, configuration, and registration (DI, settings) as needed.
 6. Run build and tests; fix failures before marking complete.
-7. Update the plan markdown document: mark the item complete with a concise summary of changes (do NOT remove historical context).
+7. Update the plan markdown document immediately after completing any Work Item, Task, or Step: mark the unit completed with a concise summary of changes (do NOT remove historical context).
 8. Output the required completion message and any user follow-up instructions.
 9. Continue automatically with the next item.
 
 General Rules:
 - Implement one work item / task / step at a time; never partially complete multiple concurrently.
+- After completing any Work Item, Task, or Step, always update the plan markdown to reflect status and summary before proceeding.
 - Prefer minimal APIs, latest C# features, async/await, nullable reference types.
 - Follow repository coding standards, architecture, naming, and versioning rules.
 - Use feature branches for new work (follow naming: feature/<area>-<short-description>). If branch does not exist, create it; if solution does not exist, create it.

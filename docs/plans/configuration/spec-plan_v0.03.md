@@ -2,7 +2,7 @@
 
 ## Configuration & Deployment Selection – Foundations
 
-- [ ] **Work Item 1: Introduce central configuration model and JSON topology**
+- [x] **Work Item 1: Introduce central configuration model and JSON topology** – Completed (validated and logged `configuration.json`, ensured the Sample module `deployments.json` is present and emitted with the module, and documented that these files must not contain secrets).
   - **Purpose**: Establish a single, predictable configuration source (`configuration.json` + per-module `deployments.json`) underpinning deployment-scoped behaviour.
   - **Acceptance Criteria**:
     - Shell host loads `configuration.json` into `.NET IConfiguration` using the standard .NET 9 hosting model.
@@ -14,15 +14,15 @@
     - Logging exists for configuration load success/failure.
     - Documentation updated to describe file locations and structures.
     - End-to-end: shell runs and an observable health/diagnostic path confirms configuration is loaded.
-  - [ ] **Task 1: Define configuration JSON structures and locations**
-    - [ ] Step 1: Create/extend `configuration.json` in the shell host content root with a root `Deployments` object containing deployment IDs, and under each, a `Modules` object with module IDs and example settings.
-    - [ ] Step 2: Create `deployments.json` for the Sample module under its project with entries that include `id` and `description` per deployment.
-    - [ ] Step 3: Ensure both files are marked as content and copied to output in the relevant `.csproj` files.
-    - [ ] Step 4: Add a short markdown note under `docs/` or comments noting that no secrets are allowed in these JSON files.
-  - [ ] **Task 2: Wire `configuration.json` into the shell host configuration pipeline**
-    - [ ] Step 1: Review `Program.cs` in `UKHO.ADDS.Management.Host` to see current configuration sources.
-    - [ ] Step 2: Add `configuration.json` as an additional configuration source (if not present), ensuring correct merge order with other config (e.g., `appsettings.*`).
-    - [ ] Step 3: Add startup logging to report successful load and missing/invalid file conditions.
+  - [x] **Task 1: Define configuration JSON structures and locations**
+    - [x] Step 1: Create/extend `configuration.json` in the shell host content root with a root `Deployments` object containing deployment IDs, and under each, a `Modules` object with module IDs and example settings.
+    - [x] Step 2: Create `deployments.json` for the Sample module under its project with entries that include `id` and `description` per deployment.
+    - [x] Step 3: Ensure both files are marked as content and copied to output in the relevant `.csproj` files.
+    - [x] Step 4: Add a short markdown note under `docs/` or comments noting that no secrets are allowed in these JSON files.
+  - [x] **Task 2: Wire `configuration.json` into the shell host configuration pipeline**
+    - [x] Step 1: Review `Program.cs` in `UKHO.ADDS.Management.Host` to see current configuration sources.
+    - [x] Step 2: Add `configuration.json` as an additional configuration source (if not present), ensuring correct merge order with other config (e.g., `appsettings.*`).
+    - [x] Step 3: Add startup logging to report successful load and missing/invalid file conditions.
   - **Files**:
     - `configuration.json`: central configuration file (new/updated).
     - `src/Modules/UKHO.ADDS.Management.Modules.Samples/deployments.json`: deployments list for Sample module (new).
@@ -48,18 +48,19 @@
     - Unit tests cover path resolution, missing-section handling, and typed binding.
     - Usage documented for module developers.
     - End-to-end: test endpoint or page uses the provider with a known `(deploymentId, moduleId)`.
-  - [ ] **Task 1: Define interface and implementation**
-    - [ ] Step 1: Add `IModuleConfigurationProvider` with `GetSection` and `GetOptions<TOptions>`.
-    - [ ] Step 2: Implement `ModuleConfigurationProvider` using injected `IConfiguration` to build the `Deployments:{deploymentId}:Modules:{moduleId}` path.
-    - [ ] Step 3: Add logging for missing sections and failed binding.
-  - [ ] **Task 2: Register provider in DI and add tests**
-    - [ ] Step 1: Register the provider in `Program.cs` using appropriate lifetime.
-    - [ ] Step 2: Add unit tests verifying correct paths and behaviour under missing/invalid config.
+  - [x] **Task 1: Define interface and implementation**
+    - [x] Step 1: Add `IModuleConfigurationProvider` with `GetSection` and `GetOptions<TOptions>`.
+    - [x] Step 2: Implement `ModuleConfigurationProvider` using injected `IConfiguration` to build the `Deployments:{deploymentId}:Modules:{moduleId}` path.
+    - [x] Step 3: Add logging for missing sections and failed binding.
+  - [x] **Task 2: Register provider in DI and add tests**
+    - [x] Step 1: Register the provider in `Program.cs` using appropriate lifetime.
+    - [x] Step 2: Add unit tests verifying correct paths and behaviour under missing/invalid config. – Completed (added `tests/Shell/UKHO.ADDS.Management.Shell.Tests` with `ModuleConfigurationProviderTests` covering section retrieval, binding, missing sections, and binding failures; referenced Shell project; ensured .NET 10 target).
   - **Files**:
     - `src/Shell/UKHO.ADDS.Management.Shell/Configuration/IModuleConfigurationProvider.cs`.
     - `src/Shell/UKHO.ADDS.Management.Shell/Configuration/ModuleConfigurationProvider.cs`.
     - `src/Shell/UKHO.ADDS.Management.Host/Program.cs` (registration).
-    - Associated test files.
+    - `tests/Shell/UKHO.ADDS.Management.Shell.Tests/UKHO.ADDS.Management.Shell.Tests.csproj`.
+    - `tests/Shell/UKHO.ADDS.Management.Shell.Tests/ModuleConfigurationProviderTests.cs`.
   - **Work Item Dependencies**:
     - Depends on Work Item 1.
   - **Run / Verification Instructions**:
@@ -68,7 +69,7 @@
 
 ## Per-Module Deployment Selection (Blazor UI)
 
-- [ ] **Work Item 3: Add per-module deployment selector UI and basic state**
+- [x] **Work Item 3: Add per-module deployment selector UI and basic state** – Completed (Radzen dropdown selector wired; deployments loaded and bound; module state updates on selection; error shown when `deployments.json` missing/invalid.)
   - **Purpose**: Show deployments defined in a module’s `deployments.json` and allow users to select them.
   - **Acceptance Criteria**:
     - Sample module page displays a deployment selector listing deployments from `deployments.json`.
@@ -78,27 +79,27 @@
     - Reusable Blazor component for deployment selection exists.
     - `deployments.json` is loaded at runtime and bound to the selector.
     - Missing/invalid `deployments.json` triggers a visible error and log entry.
-  - [ ] **Task 1: Implement loader for `deployments.json`**
-    - [ ] Step 1: Create `DeploymentRef` model with `id` and `description`.
-    - [ ] Step 2: Implement a loader service to fetch and deserialize `deployments.json` for a module.
-    - [ ] Step 3: Handle IO/JSON errors with logs and an error result.
-  - [ ] **Task 2: Create `DeploymentSelector` Blazor component**
-    - [ ] Step 1: Build component with `IEnumerable<DeploymentRef>` input and `SelectedDeploymentId` + change callback.
-    - [ ] Step 2: Render as dropdown (Radzen or HTML) aligned with shell styling.
-  - [ ] **Task 3: Integrate selector into Sample module UI**
-    - [ ] Step 1: Update `SamplePage.razor` to load deployments and render selector.
-    - [ ] Step 2: Maintain a `SelectedDeploymentId` in component state and update it on selector change.
+  - [x] **Task 1: Implement loader for `deployments.json`**
+    - [x] Step 1: Create `DeploymentRef` model with `id` and `description`. – Added `src/Shell/UKHO.ADDS.Management.Shell/Models/DeploymentRef.cs`.
+    - [x] Step 2: Implement a loader service to fetch and deserialize `deployments.json` for a module. – Added `src/Shell/UKHO.ADDS.Management.Shell/Services/DeploymentsJsonLoader.cs` with error handling and logging.
+    - [x] Step 3: Handle IO/JSON errors with logs and an error result. – Implemented `DeploymentsLoadResult` with `HasError` + message, updated loader and Sample page to display blocking error.
+  - [x] **Task 2: Create `DeploymentSelector` Blazor component**
+    - [x] Step 1: Build component with `IEnumerable<DeploymentRef>` input and `SelectedDeploymentId` + change callback. – Added `src/Shell/UKHO.ADDS.Management.Shell/Components/DeploymentSelector.razor`.
+    - [x] Step 2: Render as dropdown (Radzen) aligned with shell styling. – Updated component to use `RadzenDropDown` with `TextProperty`/`ValueProperty`.
+  - [x] **Task 3: Integrate selector into Sample module UI**
+    - [x] Step 1: Update `SamplePage.razor` to load deployments and render selector. – Updated page to use `DeploymentsJsonLoader`, display errors, and bind selector.
+    - [x] Step 2: Maintain a `SelectedDeploymentId` in component state and update it on selector change. – Implemented state update and options binding.
   - **Files**:
     - `src/Shell/UKHO.ADDS.Management.Shell/Models/DeploymentRef.cs`.
     - `src/Shell/UKHO.ADDS.Management.Shell/Services/DeploymentsJsonLoader.cs`.
     - `src/Shell/UKHO.ADDS.Management.Shell/Components/DeploymentSelector.razor`.
-    - `src/Modules/UKHO.ADDS.Management.Modules.Samples/SamplePage.razor`.
+    - `src/Modules/UKHO.ADDS.Management.Modules.Samples/Pages/SamplePage.razor`.
   - **Work Item Dependencies**:
     - Depends on Work Item 1.
   - **Run / Verification Instructions**:
     - Run host and navigate to Sample module page to verify selector behaviour.
 
-- [ ] **Work Item 4: Persist deployment selection per module using browser storage**
+- [x] **Work Item 4: Persist deployment selection per module using browser storage** – Completed (JS helper and C# interop added; Sample module reads/writes selection and validates against available deployments.)
   - **Purpose**: Remember a user’s selected deployment for each module per browser.
   - **Acceptance Criteria**:
     - Selected deployment is stored (e.g. in `localStorage`) keyed by module ID.
@@ -107,13 +108,13 @@
     - JS interop wrapper for local storage implemented.
     - Integration with selector/module state complete.
     - Manual tests confirm selection persists across reloads.
-  - [ ] **Task 1: Add local storage helper**
-    - [ ] Step 1: Add JS helper for `localStorage` read/write.
-    - [ ] Step 2: Add C# interop service (e.g. `DeploymentSelectionStorage`) to call JS helper.
-  - [ ] **Task 2: Wire storage into module UI**
-    - [ ] Step 1: On module init, read stored deployment for `moduleId` and validate against loaded deployments.
-    - [ ] Step 2: Use stored ID if valid, else default to first deployment and update storage.
-    - [ ] Step 3: On user change, update storage immediately.
+  - [x] **Task 1: Add local storage helper**
+    - [x] Step 1: Add JS helper for `localStorage` read/write. – Added `wwwroot/js/deploymentSelection.js` and referenced from `App.razor`.
+    - [x] Step 2: Add C# interop service (e.g. `DeploymentSelectionStorage`) to call JS helper. – Implemented and registered in DI.
+  - [x] **Task 2: Wire storage into module UI**
+    - [x] Step 1: On module init, read stored deployment for `moduleId` and validate against loaded deployments. – Implemented fallback to first.
+    - [x] Step 2: Use stored ID if valid, else default to first deployment and update storage. – Implemented.
+    - [x] Step 3: On user change, update storage immediately. – Implemented.
   - **Files**:
     - `src/Shell/UKHO.ADDS.Management.Host/wwwroot/js/deploymentSelection.js`.
     - `src/Shell/UKHO.ADDS.Management.Shell/Services/DeploymentSelectionStorage.cs`.
