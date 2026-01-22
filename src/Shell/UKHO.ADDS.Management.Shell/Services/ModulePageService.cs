@@ -6,7 +6,7 @@ namespace UKHO.ADDS.Management.Shell.Services
     {
         public ModulePageService(IEnumerable<IModule> modules)
         {
-            _allPages = [];
+            _allPages = new List<ModulePage>();
 
             foreach (var module in modules)
             {
@@ -28,7 +28,7 @@ namespace UKHO.ADDS.Management.Shell.Services
 
         public IEnumerable<ModulePage> Pages => _allPages;
 
-        public ModulePage FindCurrent(Uri uri)
+        public ModulePage? FindCurrent(Uri uri)
         {
             IEnumerable<ModulePage> Flatten(IEnumerable<ModulePage> e)
             {
@@ -39,7 +39,7 @@ namespace UKHO.ADDS.Management.Shell.Services
                 .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
         }
 
-        public string TitleFor(ModulePage example)
+        public string TitleFor(ModulePage? example)
         {
             if (example != null && example.Name != "Overview")
             {
@@ -49,6 +49,6 @@ namespace UKHO.ADDS.Management.Shell.Services
             return "";
         }
 
-        public string DescriptionFor(ModulePage example) => example?.Description ?? "";
+        public string DescriptionFor(ModulePage? example) => example?.Description ?? "";
     }
 }

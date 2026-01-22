@@ -6,9 +6,14 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Radzen;
 using UKHO.ADDS.Management.Host.Extensions;
-using UKHO.ADDS.Management.Host.Shell;
+using UKHO.ADDS.Management.Host.Shell; // App component
 using UKHO.ADDS.Management.Modules.Samples.Registration;
 using UKHO.ADDS.Management.Shell.Services;
+using UKHO.ADDS.Management.Shell.Configuration;
+using UKHO.ADDS.Management.Shell.Services.Storage;
+using Microsoft.Extensions.Logging;
+using System.IO;
+using System.Text.Json;
 
 namespace UKHO.ADDS.Management.Host;
 
@@ -17,6 +22,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        ConfigureConfigurationJson(builder);
 
         builder.AddServiceDefaults();
 
@@ -48,6 +55,15 @@ public class Program
         builder.Services.AddOutputCache();
 
         builder.Services.AddHttpContextAccessor().AddTransient<AuthorizationHandler>();
+
+        // Register the module configuration provider
+        builder.Services.AddSingleton<IModuleConfigurationProvider, ModuleConfigurationProvider>();
+
+        // Register deployments loader
+        builder.Services.AddScoped<DeploymentsJsonLoader>();
+
+        // Register deployment selection storage interop
+        builder.Services.AddScoped<DeploymentSelectionStorage>();
 
         var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 
@@ -91,11 +107,57 @@ public class Program
 
         app.MapStaticAssets();
 
+        // Map interactive server components.
         app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
         app.MapRazorPages();
 
         app.MapDefaultEndpoints();
 
         app.Run();
+    }
+
+    private static void ConfigureConfigurationJson(WebApplicationBuilder builder)
+    {
+        const string configurationFileName = "configuration.json";
+        var configurationFilePath = Path.Combine(builder.Environment.ContentRootPath, configurationFileName);
+
+        using var loggerFactory = LoggerFactory.Create(logging =>
+        {
+            logging.AddSimpleConsole(options =>
+            {
+                options.SingleLine = true;
+                options.TimestampFormat = "[HH:mm:ss] ";
+            });
+            logging.SetMinimumLevel(LogLevel.Information);
+        });
+
+        var logger = loggerFactory.CreateLogger<Program>();
+
+        if (!File.Exists(configurationFilePath))
+        {
+            logger.LogWarning("Configuration file '{ConfigurationFile}' was not found at '{Path}'.", configurationFileName, configurationFilePath);
+            builder.Configuration.AddJsonFile(configurationFileName, optional: true, reloadOnChange: true);
+            return;
+        }
+
+        try
+        {
+            using var stream = File.OpenRead(configurationFilePath);
+            using var document = JsonDocument.Parse(stream);
+
+            logger.LogInformation("Configuration file '{ConfigurationFile}' was parsed successfully.", configurationFileName);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Configuration file '{ConfigurationFile}' contains invalid JSON.", configurationFileName);
+            throw;
+        }
+        catch (IOException ex)
+        {
+            logger.LogError(ex, "Configuration file '{ConfigurationFile}' could not be read.", configurationFileName);
+            throw;
+        }
+
+        builder.Configuration.AddJsonFile(configurationFileName, optional: true, reloadOnChange: true);
     }
 }

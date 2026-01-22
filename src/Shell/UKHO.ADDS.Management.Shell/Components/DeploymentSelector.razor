@@ -1,0 +1,38 @@
+@using UKHO.ADDS.Management.Shell.Models
+@using Microsoft.AspNetCore.Components
+
+@if (Deployments is null || !Deployments.Any())
+{
+    <RadzenDropDown TValue="string"
+                    Data="Array.Empty<DeploymentRef>()"
+                    Placeholder="No deployments"
+                    Style="width: 20rem" />
+}
+else
+{
+    <RadzenDropDown TValue="string"
+                    Data="Deployments"
+                    TextProperty="Description"
+                    ValueProperty="Id"
+                    Value="SelectedDeploymentId"
+                    Change="OnChange"
+                    Style="width: 20rem" />
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<DeploymentRef>? Deployments { get; set; }
+
+    [Parameter]
+    public string? SelectedDeploymentId { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SelectedDeploymentIdChanged { get; set; }
+
+    private async Task OnChange(object? value)
+    {
+        var id = value?.ToString() ?? string.Empty;
+        SelectedDeploymentId = id;
+        await SelectedDeploymentIdChanged.InvokeAsync(id);
+    }
+}

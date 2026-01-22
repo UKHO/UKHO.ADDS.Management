@@ -25,5 +25,6 @@ Refer to specialized instruction files for full detail:
 - Backend (APIs/Services): `.github/copilot/copilot-instructions.backend.md`
 - Testing: `.github/copilot/copilot-instructions.testing.md`
 - Documentation Authoring: `.github/copilot/copilot-instructions.documentation.md`
+- Codeing Standards: `.github/copilot/copilot-instructions.coding-standards.md`
 
 All original guidance now resides in one of these files. Do not duplicate; update the relevant file when changing practices.

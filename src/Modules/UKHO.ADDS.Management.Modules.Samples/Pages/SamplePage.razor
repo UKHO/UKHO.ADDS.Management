@@ -1,9 +1,94 @@
 ﻿@page "/sample/main"
+@using UKHO.ADDS.Management.Shell.Models
+@using UKHO.ADDS.Management.Shell.Services
+@using UKHO.ADDS.Management.Shell.Configuration
+@using UKHO.ADDS.Management.Modules.Samples.Configuration
+@using UKHO.ADDS.Management.Shell.Components
+@using UKHO.ADDS.Management.Shell.Services.Storage
+@using UKHO.ADDS.Management.Modules.Samples.Pages
+@inject DeploymentsJsonLoader DeploymentsLoader
+@inject IModuleConfigurationProvider ConfigurationProvider
+@inject DeploymentSelectionStorage SelectionStorage
 
-<div class="my-component">
-    This component is defined in the <strong>UKHO.ADDS.Management.Modules.Samples</strong> library.
-</div>
+<h3>@displayName</h3>
 
-@code 
+@if (!string.IsNullOrWhiteSpace(loadError))
 {
+    <ConfigBlockingError Message="loadError" />
+}
+else
+{
+    <div>
+        <DeploymentSelector Deployments="deployments" SelectedDeploymentId="selectedId" SelectedDeploymentIdChanged="OnDeploymentChanged" />
+    </div>
+
+    <ConfigWarning Message="selectionWarning" />
+
+    @if (!string.IsNullOrWhiteSpace(configError))
+    {
+        <ConfigBlockingError Message="configError" />
+    }
+
+    <div>
+        <p>BaseUrl: @baseUrl</p>
+        <p>TimeoutSeconds: @timeoutSeconds</p>
+    </div>
+}
+
+@code {
+    private IEnumerable<DeploymentRef> deployments = Enumerable.Empty<DeploymentRef>();
+    private string selectedId = string.Empty;
+    private string displayName = "Sample Module";
+    private string baseUrl = string.Empty;
+    private int timeoutSeconds = 0;
+    private const string moduleId = "Samples";
+    private string loadError = string.Empty;
+    private string configError = string.Empty;
+    private string selectionWarning = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await DeploymentsLoader.LoadForModuleAsync("UKHO.ADDS.Management.Modules.Samples");
+        if (result.HasError)
+        {
+            loadError = result.ErrorMessage ?? "Failed to load deployments";
+            return;
+        }
+        deployments = result.Items;
+        if (deployments.Any())
+        {
+            var stored = await SelectionStorage.GetAsync(moduleId);
+            if (!string.IsNullOrWhiteSpace(stored) && deployments.Any(d => d.Id == stored))
+            {
+                selectedId = stored!;
+            }
+            else
+            {
+                selectionWarning = !string.IsNullOrWhiteSpace(stored)
+                    ? $"Stored deployment '{stored}' is not valid for module '{moduleId}'. Using '{deployments.First().Id}' instead."
+                    : string.Empty;
+                selectedId = deployments.First().Id;
+                await SelectionStorage.SetAsync(moduleId, selectedId);
+            }
+            await BindOptions();
+        }
+    }
+
+    private async Task OnDeploymentChanged(string id)
+    {
+        selectedId = id;
+        await SelectionStorage.SetAsync(moduleId, selectedId);
+        await BindOptions();
+    }
+
+    private Task BindOptions()
+    {
+        var (options, errorMessage) = SamplePageState.BindOptions(ConfigurationProvider, selectedId, moduleId);
+        configError = errorMessage ?? string.Empty;
+
+        displayName = options.DisplayName ?? "Sample Module";
+        baseUrl = options.BaseUrl ?? string.Empty;
+        timeoutSeconds = options.TimeoutSeconds;
+        return Task.CompletedTask;
+    }
 }

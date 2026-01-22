@@ -1,0 +1,22 @@
+{
+  "Deployments": {
+    "dev": {
+      "Modules": {
+        "Samples": {
+          "BaseUrl": "https://dev.api.example.com/",
+          "DisplayName": "Samples (Dev)",
+          "TimeoutSeconds": 30
+        }
+      }
+    },
+    "prod": {
+      "Modules": {
+        "Samples": {
+          "BaseUrl": "https://api.example.com/",
+          "DisplayName": "Samples (Prod)",
+          "TimeoutSeconds": 60
+        }
+      }
+    }
+  }
+}
