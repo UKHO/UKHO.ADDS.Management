@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
     <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="13.1.0" />
-    <PackageReference Include="AzureKeyVaultEmulator.Aspire.Hosting" Version="2.7.8" />
+    <PackageReference Include="AzureKeyVaultEmulator.Aspire.Hosting" Version="2.8.2" />
 	  <PackageReference Include="Aspire.Hosting.Keycloak" Version="9.2.1-preview.1.25222.1" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.0" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
