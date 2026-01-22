@@ -19,18 +19,10 @@
 		<ProjectReference Include="..\UKHO.ADDS.Management.Shell\UKHO.ADDS.Management.Shell.csproj" />
 	</ItemGroup>
 
-	<PropertyGroup>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
-	</PropertyGroup>
-
 	<ItemGroup>
-		<Content Include="configuration.json">
+		<Content Update="configuration.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-		<RazorComponent Include="Shell\**\*.razor" />
 	</ItemGroup>
 
 </Project>
