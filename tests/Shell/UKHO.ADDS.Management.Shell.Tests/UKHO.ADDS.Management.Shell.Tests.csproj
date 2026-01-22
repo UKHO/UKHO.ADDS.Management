@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Shell\UKHO.ADDS.Management.Shell\UKHO.ADDS.Management.Shell.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\UKHO.ADDS.Management.Modules.Samples\UKHO.ADDS.Management.Modules.Samples.csproj" />
   </ItemGroup>
 
 </Project>

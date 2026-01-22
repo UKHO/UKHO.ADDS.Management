@@ -10,6 +10,7 @@ namespace UKHO.ADDS.Management.Shell.Models
     {
         public IReadOnlyList<DeploymentRef> Items { get; init; } = Array.Empty<DeploymentRef>();
         public string? ErrorMessage { get; init; }
+        public string? WarningMessage { get; init; }
         public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
         public static DeploymentsLoadResult Success(IEnumerable<DeploymentRef> items) => new() { Items = items.ToList() };
         public static DeploymentsLoadResult Error(string message) => new() { ErrorMessage = message };

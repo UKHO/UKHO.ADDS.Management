@@ -28,7 +28,7 @@ namespace UKHO.ADDS.Management.Shell.Services
                 var path = Path.Combine(basePath, "src", "Modules", moduleProjectFolder, "deployments.json");
                 if (!File.Exists(path))
                 {
-                    var msg = $"deployments.json not found for module {moduleProjectFolder} at {path}";
+                    var msg = $"Required file 'deployments.json' not found for module '{moduleProjectFolder}' at '{path}'.";
                     logger.LogWarning(msg);
                     return DeploymentsLoadResult.Error(msg);
                 }
@@ -37,7 +37,7 @@ namespace UKHO.ADDS.Management.Shell.Services
                 var items = await JsonSerializer.DeserializeAsync<List<DeploymentRef>>(stream) ?? new List<DeploymentRef>();
                 if (items.Count == 0)
                 {
-                    var msg = $"deployments.json is empty for module {moduleProjectFolder}";
+                    var msg = $"Required file 'deployments.json' is empty for module '{moduleProjectFolder}'.";
                     logger.LogWarning(msg);
                     return DeploymentsLoadResult.Error(msg);
                 }
@@ -45,7 +45,7 @@ namespace UKHO.ADDS.Management.Shell.Services
             }
             catch (JsonException jex)
             {
-                var msg = $"Invalid JSON in deployments.json for module {moduleProjectFolder}: {jex.Message}";
+                var msg = $"Invalid JSON in required file 'deployments.json' for module '{moduleProjectFolder}': {jex.Message}";
                 logger.LogError(jex, msg);
                 return DeploymentsLoadResult.Error(msg);
             }

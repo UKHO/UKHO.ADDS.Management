@@ -5,6 +5,7 @@
 @using UKHO.ADDS.Management.Modules.Samples.Configuration
 @using UKHO.ADDS.Management.Shell.Components
 @using UKHO.ADDS.Management.Shell.Services.Storage
+@using UKHO.ADDS.Management.Modules.Samples.Pages
 @inject DeploymentsJsonLoader DeploymentsLoader
 @inject IModuleConfigurationProvider ConfigurationProvider
 @inject DeploymentSelectionStorage SelectionStorage
@@ -13,13 +14,20 @@
 
 @if (!string.IsNullOrWhiteSpace(loadError))
 {
-    <div class="alert alert-danger">@loadError</div>
+    <ConfigBlockingError Message="loadError" />
 }
 else
 {
     <div>
         <DeploymentSelector Deployments="deployments" SelectedDeploymentId="selectedId" SelectedDeploymentIdChanged="OnDeploymentChanged" />
     </div>
+
+    <ConfigWarning Message="selectionWarning" />
+
+    @if (!string.IsNullOrWhiteSpace(configError))
+    {
+        <ConfigBlockingError Message="configError" />
+    }
 
     <div>
         <p>BaseUrl: @baseUrl</p>
@@ -35,6 +43,8 @@ else
     private int timeoutSeconds = 0;
     private const string moduleId = "Samples";
     private string loadError = string.Empty;
+    private string configError = string.Empty;
+    private string selectionWarning = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,6 +64,9 @@ else
             }
             else
             {
+                selectionWarning = !string.IsNullOrWhiteSpace(stored)
+                    ? $"Stored deployment '{stored}' is not valid for module '{moduleId}'. Using '{deployments.First().Id}' instead."
+                    : string.Empty;
                 selectedId = deployments.First().Id;
                 await SelectionStorage.SetAsync(moduleId, selectedId);
             }
@@ -70,7 +83,9 @@ else
 
     private Task BindOptions()
     {
-        var options = ConfigurationProvider.GetOptions<SampleModuleOptions>(selectedId, moduleId);
+        var (options, errorMessage) = SamplePageState.BindOptions(ConfigurationProvider, selectedId, moduleId);
+        configError = errorMessage ?? string.Empty;
+
         displayName = options.DisplayName ?? "Sample Module";
         baseUrl = options.BaseUrl ?? string.Empty;
         timeoutSeconds = options.TimeoutSeconds;

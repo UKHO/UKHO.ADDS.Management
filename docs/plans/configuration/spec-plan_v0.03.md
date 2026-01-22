@@ -1,5 +1,15 @@
 # Implementation Plan – Uplift from v0.02 to v0.03
 
+## Related Specifications (v0.03)
+
+- `docs/specs/spec-system-overview_v0.03.md`
+- `docs/specs/spec-architecture-components_v0.03.md`
+- `docs/specs/spec-frontend-functional_v0.03.md`
+- `docs/specs/spec-infra-deployment_v0.03.md`
+
+Additional guide:
+- `docs/plans/configuration/spec-plan_v0.03-usage.md`
+
 ## Configuration & Deployment Selection – Foundations
 
 - [x] **Work Item 1: Introduce central configuration model and JSON topology** – Completed (validated and logged `configuration.json`, ensured the Sample module `deployments.json` is present and emitted with the module, and documented that these files must not contain secrets).
@@ -126,7 +136,7 @@
 
 ## Module Behaviour & Error Handling
 
-- [ ] **Work Item 5: Use configuration provider in Sample module as a vertical slice**
+- [x] **Work Item 5: Use configuration provider in Sample module as a vertical slice** – Completed (Sample module binds `SampleModuleOptions` via `IModuleConfigurationProvider` for active deployment; added unit coverage for typed per-deployment binding.)
   - **Purpose**: Demonstrate per-deployment behaviour in a module driven by configuration.
   - **Acceptance Criteria**:
     - `SampleModuleOptions` is bound from `configuration.json` via `IModuleConfigurationProvider`.
@@ -135,16 +145,16 @@
     - Sample module reads typed options for active `(deploymentId, moduleId)`.
     - Visible behaviour differs across deployments.
     - Unit tests cover binding and module behaviour.
-  - [ ] **Task 1: Define `SampleModuleOptions` and config values**
-    - [ ] Step 1: Create `SampleModuleOptions` with properties such as `BaseUrl`, `DisplayName`, etc.
-    - [ ] Step 2: Populate `configuration.json` with differing values for each Sample module deployment.
-  - [ ] **Task 2: Integrate provider into Sample module**
-    - [ ] Step 1: Inject `IModuleConfigurationProvider` into Sample module/page.
-    - [ ] Step 2: On init and deployment change, call `GetOptions<SampleModuleOptions>(deploymentId, moduleId)`.
-    - [ ] Step 3: Use options to modify UI or downstream calls.
-  - [ ] **Task 3: Implement error handling at module level**
-    - [ ] Step 1: Mark required properties; handle missing ones with defaults and warnings.
-    - [ ] Step 2: For missing configuration sections, apply fallback or show blocking error according to spec.
+  - [x] **Task 1: Define `SampleModuleOptions` and config values**
+    - [x] Step 1: Create `SampleModuleOptions` with properties such as `BaseUrl`, `DisplayName`, etc. – Already present (`src/Modules/UKHO.ADDS.Management.Modules.Samples/Configuration/SampleModuleOptions.cs`).
+    - [x] Step 2: Populate `configuration.json` with differing values for each Sample module deployment. – Already present (`src/Shell/UKHO.ADDS.Management.Host/configuration.json`) with dev/prod values.
+  - [x] **Task 2: Integrate provider into Sample module**
+    - [x] Step 1: Inject `IModuleConfigurationProvider` into Sample module/page. – Already wired in `SamplePage.razor`.
+    - [x] Step 2: On init and deployment change, call `GetOptions<SampleModuleOptions>(deploymentId, moduleId)`. – Implemented in `SamplePage.razor`.
+    - [x] Step 3: Use options to modify UI or downstream calls. – Page displays bound values.
+  - [x] **Task 3: Implement error handling at module level** – Completed (added configuration validation to surface blocking errors for missing sections / missing required fields; tests added.)
+    - [x] Step 1: Mark required properties; handle missing ones with defaults and warnings. – Implemented required `BaseUrl` check; missing values surface a blocking error.
+    - [x] Step 2: For missing configuration sections, apply fallback or show blocking error according to spec. – Missing section surfaces blocking error.
   - **Files**:
     - `src/Modules/UKHO.ADDS.Management.Modules.Samples/Configuration/SampleModuleOptions.cs`.
     - Sample module pages/services.
@@ -154,7 +164,7 @@
   - **Run / Verification Instructions**:
     - Run host, navigate to Sample module, switch deployments, and observe behaviour changes.
 
-- [ ] **Work Item 6: Implement consistent configuration error handling & UX**
+- [x] **Work Item 6: Implement consistent configuration error handling & UX** – Completed (added shared UI components for warnings/blocking errors; improved deployments loader error messaging; surfaced invalid stored deployment warning; ensured missing/incomplete configuration is blocking.)
   - **Purpose**: Align runtime behaviour with spec for configuration and deployment data issues.
   - **Acceptance Criteria**:
     - Missing/empty `deployments.json` -> blocking module error.
@@ -163,13 +173,13 @@
   - **Definition of Done**:
     - Shared components exist for warnings and blocking errors.
     - Error behaviour implemented in loader, selection, and module-level config handling.
-  - [ ] **Task 1: Define shared UI for warnings/errors**
-    - [ ] Step 1: Implement a blocking error view/state for all configuration errors
-    - [ ] Step 2: Implement a blocking error view/state when module cannot function.
-  - [ ] **Task 2: Wire validation into flows**
-    - [ ] Step 1: In `DeploymentsJsonLoader`, detect missing/empty file and surface blocking error.
-    - [ ] Step 2: In module init, handle invalid stored `deploymentId` via fallback and logging.
-    - [ ] Step 3: In options consumption, decide which errors are non-blocking vs blocking and update UI.
+  - [x] **Task 1: Define shared UI for warnings/errors**
+    - [x] Step 1: Implement a blocking error view/state for all configuration errors – Added `ConfigBlockingError.razor`.
+    - [x] Step 2: Implement a blocking error view/state when module cannot function. – Added `ConfigWarning.razor` for non-blocking messaging.
+  - [x] **Task 2: Wire validation into flows**
+    - [x] Step 1: In `DeploymentsJsonLoader`, detect missing/empty file and surface blocking error. – Loader returns blocking error messages; tests added.
+    - [x] Step 2: In module init, handle invalid stored `deploymentId` via fallback and logging. – Sample module now warns and falls back to first deployment.
+    - [x] Step 3: In options consumption, decide which errors are non-blocking vs blocking and update UI. – Missing config section / missing required BaseUrl is blocking; invalid stored deployment is warning.
   - **Files**:
     - `src/Shell/UKHO.ADDS.Management.Shell/Components/ConfigWarning.razor` (or similar).
     - Updated loader and Sample module pages/services.
@@ -180,7 +190,7 @@
 
 ## Testing & Documentation
 
-- [ ] **Work Item 7: Testing and documentation consolidation**
+- [x] **Work Item 7: Testing and documentation consolidation** – Completed (added unit tests for deployments loader invalid JSON and selection storage JS interop; added v0.03 usage guide; added spec cross-links.)
   - **Purpose**: Ensure the v0.03 uplift is robust and clearly documented.
   - **Acceptance Criteria**:
     - Unit tests cover provider, loaders, and selection logic.
@@ -189,12 +199,12 @@
   - **Definition of Done**:
     - All new tests pass in CI.
     - Documentation for configuration and deployments is updated.
-  - [ ] **Task 1: Strengthen test coverage**
-    - [ ] Step 1: Add unit tests for `ModuleConfigurationProvider`, `DeploymentsJsonLoader`, and selection storage.
-    - [ ] Step 2: Add Blazor component tests for `DeploymentSelector` if bUnit is available.
-  - [ ] **Task 2: Update documentation**
-    - [ ] Step 1: Add or update `docs/` markdown describing how to define deployments and module configuration.
-    - [ ] Step 2: Cross-link `spec-system-overview_v0.03`, `spec-architecture-components_v0.03`, `spec-frontend-functional_v0.03`, and `spec-infra-deployment_v0.03`.
+  - [x] **Task 1: Strengthen test coverage**
+    - [x] Step 1: Add unit tests for `ModuleConfigurationProvider`, `DeploymentsJsonLoader`, and selection storage. – Added `DeploymentSelectionStorageTests` and extended `DeploymentsJsonLoaderTests` (includes invalid JSON case).
+    - [ ] Step 2: Add Blazor component tests for `DeploymentSelector` if bUnit is available. – Skipped (no bUnit present in repo; not added).
+  - [x] **Task 2: Update documentation**
+    - [x] Step 1: Add or update `docs/` markdown describing how to define deployments and module configuration. – Added `docs/plans/configuration/spec-plan_v0.03-usage.md`.
+    - [x] Step 2: Cross-link `spec-system-overview_v0.03`, `spec-architecture-components_v0.03`, `spec-frontend-functional_v0.03`, and `spec-infra-deployment_v0.03`. – Linked from top of this plan.
   - **Files**:
     - Test project files and new test classes.
     - `docs/` markdown files.
