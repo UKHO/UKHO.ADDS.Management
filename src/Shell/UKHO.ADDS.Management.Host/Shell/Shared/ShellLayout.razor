@@ -1,10 +1,17 @@
 ﻿@using System.Globalization
+@using UKHO.ADDS.Management.Shell.Components
+@using UKHO.ADDS.Management.Shell.Models
 @using UKHO.ADDS.Management.Shell.Modules
 @using UKHO.ADDS.Management.Shell.Services
+@using UKHO.ADDS.Management.Shell.Services.Storage
 @inherits LayoutComponentBase
 
 @inject ModulePageService DashboardPageService
+@inject DeploymentsJsonLoader DeploymentsLoader
+@inject ILogger<ShellLayout> Logger
 @inject NavigationManager NavManager
+@inject DeploymentSelectionStorage SelectionStorage
+@inject IJSRuntime JS
 
 <RadzenComponents />
 
@@ -20,7 +27,11 @@
                 </RadzenColumn>
                 <RadzenColumn Size="7">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-                        <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
+                        <div class="align-items-center" style="display: inline-flex; gap: 0.5rem;">
+                            <DeploymentSelector Deployments="_deployments"
+                                                SelectedDeploymentId="_selectedDeploymentId"
+                                                SelectedDeploymentIdChanged="OnSelectedDeploymentIdChanged" />
+
                             <RadzenButton Text="Logout"
                                           Class="rz-text-nowrap rz-mx-2 rz-mx-lg-4"
                                           Click="@OnLogoutClicked" />
@@ -79,12 +90,19 @@
 }
 
 @code {
+    private const string ModuleId = "Samples";
+    private const string ModuleAssemblyName = "UKHO.ADDS.Management.Modules.Samples";
+
     private RadzenSidebar _sidebar0;
     private RadzenBody _body0;
     private bool _sidebarExpanded = true;
     private bool _rendered;
     private IEnumerable<ModulePage> _pages;
     private ModulePage _page;
+
+    private IEnumerable<DeploymentRef> _deployments = Enumerable.Empty<DeploymentRef>();
+    private string _selectedDeploymentId = string.Empty;
+    private bool _deploymentSelectionInitialized;
 
     protected override void OnInitialized()
     {
@@ -94,6 +112,47 @@
         _page = DashboardPageService.FindCurrent(new Uri(NavManager.Uri));
 
         Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("ShellLayout: loading deployments for header selector from host deployments.json");
+        var result = await DeploymentsLoader.LoadForModuleAsync(ModuleAssemblyName);
+        if (result.HasError)
+        {
+            Logger.LogWarning("ShellLayout: deployments load error: {Error}", result.ErrorMessage);
+            _deployments = Enumerable.Empty<DeploymentRef>();
+            _selectedDeploymentId = string.Empty;
+            return;
+        }
+
+        _deployments = result.Items;
+        if (!_deployments.Any())
+        {
+            Logger.LogWarning("ShellLayout: deployments loaded but list was empty");
+            _selectedDeploymentId = string.Empty;
+            return;
+        }
+
+        var firstValid = _deployments.FirstOrDefault(d => !string.IsNullOrWhiteSpace(d.Id));
+        if (firstValid is null)
+        {
+            Logger.LogWarning("ShellLayout: deployments loaded ({Count}) but none had a valid 'id'", _deployments.Count());
+            _selectedDeploymentId = string.Empty;
+            return;
+        }
+
+        _selectedDeploymentId = firstValid.Id;
+        Logger.LogInformation(
+            "ShellLayout: deployments loaded ({Count}); defaulting selection to '{Selected}'",
+            _deployments.Count(),
+            _selectedDeploymentId);
+    }
+
+    private async Task OnSelectedDeploymentIdChanged(string deploymentId)
+    {
+        _selectedDeploymentId = deploymentId;
+        await SelectionStorage.SetAsync(ModuleId, _selectedDeploymentId);
     }
 
     private void OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
@@ -113,6 +172,43 @@
             _rendered = true;
             StateHasChanged();
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _deploymentSelectionInitialized || !_deployments.Any())
+        {
+            return;
+        }
+
+        _deploymentSelectionInitialized = true;
+
+        await JS.InvokeVoidAsync(
+            "console.debug",
+            $"ShellLayout: deployments available={_deployments.Count()}, defaultSelected='{_selectedDeploymentId}'");
+
+        var stored = await SelectionStorage.GetAsync(ModuleId);
+        await JS.InvokeVoidAsync(
+            "console.debug",
+            $"ShellLayout: stored selection for module '{ModuleId}' is '{stored}'");
+
+        var selected = !string.IsNullOrWhiteSpace(stored) && _deployments.Any(d => d.Id == stored)
+            ? stored!
+            : _deployments.First().Id;
+
+        if (!string.Equals(_selectedDeploymentId, selected, StringComparison.Ordinal))
+        {
+            _selectedDeploymentId = selected;
+            await JS.InvokeVoidAsync(
+                "console.debug",
+                $"ShellLayout: applying stored selection '{_selectedDeploymentId}'");
+            StateHasChanged();
+        }
+
+        await SelectionStorage.SetAsync(ModuleId, _selectedDeploymentId);
+        await JS.InvokeVoidAsync(
+            "console.debug",
+            $"ShellLayout: persisted selection '{_selectedDeploymentId}' for module '{ModuleId}'");
     }
 
     private void OnLogoutClicked()

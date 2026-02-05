@@ -1,5 +1,8 @@
 @using UKHO.ADDS.Management.Shell.Models
 @using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@using Radzen.Blazor
+@inject IJSRuntime JS
 
 @if (Deployments is null || !Deployments.Any())
 {
@@ -10,18 +13,34 @@
 }
 else
 {
+    <span style="display:none">@Deployments.Count()</span>
     <RadzenDropDown TValue="string"
+                    @ref="_dropdown"
+                    class="deployment-selector"
+                    Change="OnChange"
                     Data="Deployments"
-                    TextProperty="Description"
+                    TextProperty="Id"
                     ValueProperty="Id"
                     Value="SelectedDeploymentId"
-                    Change="OnChange"
-                    Style="width: 20rem" />
+                    ValueChanged="OnValueChanged"
+                    Style="width: 20rem; min-width: 12rem;">
+        <ValueTemplate Context="d">
+            <div style="font-weight:600;">@d.Id</div>
+        </ValueTemplate>
+        <Template Context="d">
+            <div style="display:flex; flex-direction:column; line-height:1.2;">
+                <div style="font-weight:600;">@d.Id</div>
+                <div style="opacity:0.85; font-size:0.9rem;">@d.Description</div>
+            </div>
+        </Template>
+    </RadzenDropDown>
 }
 
 @code {
-    [Parameter]
-    public IEnumerable<DeploymentRef>? Deployments { get; set; }
+private RadzenDropDown<string>? _dropdown;
+
+[Parameter]
+public IEnumerable<DeploymentRef>? Deployments { get; set; }
 
     [Parameter]
     public string? SelectedDeploymentId { get; set; }
@@ -29,10 +48,25 @@ else
     [Parameter]
     public EventCallback<string> SelectedDeploymentIdChanged { get; set; }
 
+    private Task OnValueChanged(string value)
+    {
+        SelectedDeploymentId = value;
+        return SelectedDeploymentIdChanged.InvokeAsync(value);
+    }
+
     private async Task OnChange(object? value)
     {
         var id = value?.ToString() ?? string.Empty;
-        SelectedDeploymentId = id;
-        await SelectedDeploymentIdChanged.InvokeAsync(id);
+        await OnValueChanged(id);
+
+        // Workaround: in the header layout the Radzen dropdown popup can remain open after selection.
+        // Force the popup to close by blurring and then re-focusing elsewhere.
+        await JS.InvokeVoidAsync("eval", @"
+            setTimeout(() => {
+                const panel = document.querySelector('.deployment-selector .rz-dropdown-panel');
+                if (panel) panel.style.display = 'none';
+                document.activeElement?.blur();
+            }, 10);
+        ");
     }
 }

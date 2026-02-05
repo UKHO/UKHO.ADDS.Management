@@ -25,4 +25,10 @@
 		</Content>
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Update="deployments.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
 </Project>

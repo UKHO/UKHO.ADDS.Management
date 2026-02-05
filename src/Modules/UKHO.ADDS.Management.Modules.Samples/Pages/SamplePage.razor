@@ -6,7 +6,6 @@
 @using UKHO.ADDS.Management.Shell.Components
 @using UKHO.ADDS.Management.Shell.Services.Storage
 @using UKHO.ADDS.Management.Modules.Samples.Pages
-@inject DeploymentsJsonLoader DeploymentsLoader
 @inject IModuleConfigurationProvider ConfigurationProvider
 @inject DeploymentSelectionStorage SelectionStorage
 
@@ -18,10 +17,6 @@
 }
 else
 {
-    <div>
-        <DeploymentSelector Deployments="deployments" SelectedDeploymentId="selectedId" SelectedDeploymentIdChanged="OnDeploymentChanged" />
-    </div>
-
     <ConfigWarning Message="selectionWarning" />
 
     @if (!string.IsNullOrWhiteSpace(configError))
@@ -36,7 +31,6 @@ else
 }
 
 @code {
-    private IEnumerable<DeploymentRef> deployments = Enumerable.Empty<DeploymentRef>();
     private string selectedId = string.Empty;
     private string displayName = "Sample Module";
     private string baseUrl = string.Empty;
@@ -48,36 +42,17 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await DeploymentsLoader.LoadForModuleAsync("UKHO.ADDS.Management.Modules.Samples");
-        if (result.HasError)
+        var stored = await SelectionStorage.GetAsync(moduleId);
+        if (!string.IsNullOrWhiteSpace(stored))
         {
-            loadError = result.ErrorMessage ?? "Failed to load deployments";
+            selectedId = stored!;
+        }
+        else
+        {
+            loadError = "No deployment selected. Please select a deployment from the header.";
             return;
         }
-        deployments = result.Items;
-        if (deployments.Any())
-        {
-            var stored = await SelectionStorage.GetAsync(moduleId);
-            if (!string.IsNullOrWhiteSpace(stored) && deployments.Any(d => d.Id == stored))
-            {
-                selectedId = stored!;
-            }
-            else
-            {
-                selectionWarning = !string.IsNullOrWhiteSpace(stored)
-                    ? $"Stored deployment '{stored}' is not valid for module '{moduleId}'. Using '{deployments.First().Id}' instead."
-                    : string.Empty;
-                selectedId = deployments.First().Id;
-                await SelectionStorage.SetAsync(moduleId, selectedId);
-            }
-            await BindOptions();
-        }
-    }
 
-    private async Task OnDeploymentChanged(string id)
-    {
-        selectedId = id;
-        await SelectionStorage.SetAsync(moduleId, selectedId);
         await BindOptions();
     }
 
