@@ -16,7 +16,8 @@ internal static class Program
 
         var keycloak = builder.AddKeycloak("keycloak", 8080, username, password)
             .WithDataVolume()
-            .WithRealmImport("./Realms");
+            .WithRealmImport("./Realms")
+            .WithLifetime(ContainerLifetime.Persistent);
 
         var keyVault = builder.AddAzureKeyVaultEmulator(ServiceNames.KeyVault,
             new KeyVaultEmulatorOptions
