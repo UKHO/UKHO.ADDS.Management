@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Radzen;
 using UKHO.ADDS.Management.Host.Extensions;
 using UKHO.ADDS.Management.Host.Shell; // App component
+using UKHO.ADDS.Management.Modules.FileShare.Registration;
+using UKHO.ADDS.Management.Modules.Permit.Registration;
 using UKHO.ADDS.Management.Modules.Samples.Registration;
 using UKHO.ADDS.Management.Shell.Services;
 using UKHO.ADDS.Management.Shell.Configuration;
@@ -29,6 +31,8 @@ public class Program
 
         // Registers the sample module
         builder.Services.AddSampleModule();
+        builder.Services.AddFileShareModule();
+        builder.Services.AddPermitModule();
 
         builder.Services.AddScoped(sp =>
         {
@@ -51,6 +55,10 @@ public class Program
         builder.Services.AddRadzenComponents();
         builder.Services.AddRadzenQueryStringThemeService();
 
+        builder.Services.AddSingleton<ModuleHealthService>();
+        builder.Services.AddScoped<DeploymentContext>();
+        builder.Services.AddScoped<ModuleLifecycleOrchestrator>();
+        builder.Services.AddScoped<ConfigurationReloadNotifier>();
         builder.Services.AddScoped<ModulePageService>();
         builder.Services.AddOutputCache();
 

@@ -1,0 +1,16 @@
+@page "/sample/secure"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "showsamplepage")]
+
+@using Microsoft.AspNetCore.Components.Authorization
+
+<RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H1" class="rz-mt-6">
+    Sample secure page
+</RadzenText>
+
+<RadzenText class="rz-mt-4">
+    This page is protected by the <code>showsamplepage</code> role.
+</RadzenText>
+
+<AuthorizeView Roles="showsamplebutton">
+    <RadzenButton Text="Role-gated action" ButtonStyle="ButtonStyle.Primary" class="rz-mt-6" />
+</AuthorizeView>
