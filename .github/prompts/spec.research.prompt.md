@@ -4,6 +4,15 @@ I want to collaborate with you a Senior Business Analyst to produce a set of spe
 
 Use `spec-template_v1.1.md` as the basis for all outputs.
 
+## Documentation location (Work Package folder)
+All documents for this piece of work MUST be created under a single subfolder of `./docs/`.
+
+- Folder naming: `xxx-<descriptor>` where `xxx` is the next incremental number (e.g. `001`, `002`, ...) and `<descriptor>` succinctly describes the work.
+- Use `./docs/001-Initial-Shell/` as the reference example for structure and naming.
+- Store the overview spec and each component/service spec inside the same Work Package folder.
+- Do not write specs to `docs/specs/` for this workflow.
+- In outputs, include the target output path for each document (relative to repo root).
+
 **Process:**
 - Start by asking me a number of questions to clarify and expand on the initial concept.
 - Keep asking until you have a full understanding of the requirements.

@@ -14,8 +14,9 @@ Be concise but complete. Prefer current research (Microsoft Learn) for Microsoft
 - Microsoft tech (Blazor, ASP.NET Core, Azure, .NET): use Microsoft Learn tools.
 
 ## Documentation Workflow (Summary)
-- Specifications: versioned under `docs/specs/` (never overwrite; increment versions).
-- Plans: versioned under `docs/plans/{area}/` (reference specs; include Baseline/Delta/Carry-over).
+- For each new Work Package/piece of work: create a new numbered folder under `./docs/` named `xxx-<descriptor>` (e.g. `001-Initial-Shell`).
+- Store ALL related documents (specs, plans, architecture notes, etc.) together inside that Work Package folder.
+- Do not overwrite prior work packages; create the next incremental folder (e.g. `002-...`).
 - Use appropriate prompt family & phase from `.github/prompts/`.
 
 ## Detailed Topic Guides
