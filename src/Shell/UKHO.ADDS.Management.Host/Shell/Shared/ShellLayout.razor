@@ -194,7 +194,7 @@
 
         var selected = !string.IsNullOrWhiteSpace(stored) && _deployments.Any(d => d.Id == stored)
             ? stored!
-            : _deployments.First().Id;
+            : _deployments.First(d => !string.IsNullOrWhiteSpace(d.Id)).Id;
 
         if (!string.Equals(_selectedDeploymentId, selected, StringComparison.Ordinal))
         {
