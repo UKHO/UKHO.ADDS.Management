@@ -37,16 +37,33 @@ else
 }
 
 @code {
-private RadzenDropDown<string>? _dropdown;
+    private RadzenDropDown<string>? _dropdown;
 
-[Parameter]
-public IEnumerable<DeploymentRef>? Deployments { get; set; }
+    [Parameter]
+    public IEnumerable<DeploymentRef>? Deployments { get; set; }
 
     [Parameter]
     public string? SelectedDeploymentId { get; set; }
 
     [Parameter]
     public EventCallback<string> SelectedDeploymentIdChanged { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Close dropdown panels when clicking outside
+            await JS.InvokeVoidAsync("eval", @"
+                document.addEventListener('mousedown', function(e) {
+                    if (!e.target.closest('.rz-dropdown') &&
+                        !e.target.closest('.rz-dropdown-panel')) {
+                        document.querySelectorAll('.rz-dropdown-panel')
+                            .forEach(p => p.style.display = 'none');
+                    }
+                });
+            ");
+        }
+    }
 
     private Task OnValueChanged(string value)
     {
@@ -59,14 +76,11 @@ public IEnumerable<DeploymentRef>? Deployments { get; set; }
         var id = value?.ToString() ?? string.Empty;
         await OnValueChanged(id);
 
-        // Workaround: in the header layout the Radzen dropdown popup can remain open after selection.
-        // Force the popup to close by blurring and then re-focusing elsewhere.
+        // Close the dropdown panel after selection
         await JS.InvokeVoidAsync("eval", @"
-            setTimeout(() => {
-                const panel = document.querySelector('.deployment-selector .rz-dropdown-panel');
-                if (panel) panel.style.display = 'none';
-                document.activeElement?.blur();
-            }, 10);
+            document.querySelectorAll('.rz-dropdown-panel')
+                .forEach(p => p.style.display = 'none');
+            document.activeElement?.blur();
         ");
     }
 }
