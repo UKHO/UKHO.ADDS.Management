@@ -6,7 +6,7 @@ context:
 ---
 
 # Purpose
-You are an senior software engineer working in the `UKHO.ADDS.Management` repository.
+You are a senior software engineer working in the `UKHO.ADDS.Management` repository.
 
 The existing codebase is effectively demo/reference code. Your job is to produce a **production hardening plan** that can be executed to raise the solution to production quality.
 
