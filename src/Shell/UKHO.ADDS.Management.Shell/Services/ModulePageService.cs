@@ -6,22 +6,22 @@ namespace UKHO.ADDS.Management.Shell.Services
     {
         public ModulePageService(IEnumerable<IModule> modules)
         {
-            _allPages = new List<ModulePage>();
+            _allPages = [new ModulePage { Name = "Home", Path = "/", Icon = "\ue88a" }];
 
             foreach (var module in modules)
             {
                 _allPages.AddRange(module.Pages);
             }
 
-            _allPages.Add(new ModulePage { Name = "Services", Path = "/", Icon = "\ue88a" });
-            _allPages.Add(new ModulePage
-            {
-                Name = "Explorer",
-                Path = "/_dashboard/explorer",
-                Title = "",
-                Description = "",
-                Icon = "\ue0c6"
-            });
+           
+            //_allPages.Add(new ModulePage
+            //{
+            //    Name = "Explorer",
+            //    Path = "/_dashboard/explorer",
+            //    Title = "",
+            //    Description = "",
+            //    Icon = "\ue0c6"
+            //});
         }
 
         private readonly List<ModulePage> _allPages;

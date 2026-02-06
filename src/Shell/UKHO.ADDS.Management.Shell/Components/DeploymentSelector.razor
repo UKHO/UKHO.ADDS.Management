@@ -1,5 +1,8 @@
 @using UKHO.ADDS.Management.Shell.Models
 @using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@using Radzen.Blazor
+@inject IJSRuntime JS
 
 @if (Deployments is null || !Deployments.Any())
 {
@@ -10,16 +13,32 @@
 }
 else
 {
+    <span style="display:none">@Deployments.Count()</span>
     <RadzenDropDown TValue="string"
+                    @ref="_dropdown"
+                    class="deployment-selector"
+                    Change="OnChange"
                     Data="Deployments"
-                    TextProperty="Description"
+                    TextProperty="Id"
                     ValueProperty="Id"
                     Value="SelectedDeploymentId"
-                    Change="OnChange"
-                    Style="width: 20rem" />
+                    ValueChanged="OnValueChanged"
+                    Style="width: 20rem; min-width: 12rem;">
+        <ValueTemplate Context="d">
+            <div style="font-weight:600;">@d.Id</div>
+        </ValueTemplate>
+        <Template Context="d">
+            <div style="display:flex; flex-direction:column; line-height:1.2;">
+                <div style="font-weight:600;">@d.Id</div>
+                <div style="opacity:0.85; font-size:0.9rem;">@d.Description</div>
+            </div>
+        </Template>
+    </RadzenDropDown>
 }
 
 @code {
+    private RadzenDropDown<string>? _dropdown;
+
     [Parameter]
     public IEnumerable<DeploymentRef>? Deployments { get; set; }
 
@@ -29,10 +48,39 @@ else
     [Parameter]
     public EventCallback<string> SelectedDeploymentIdChanged { get; set; }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Close dropdown panels when clicking outside
+            await JS.InvokeVoidAsync("eval", @"
+                document.addEventListener('mousedown', function(e) {
+                    if (!e.target.closest('.rz-dropdown') &&
+                        !e.target.closest('.rz-dropdown-panel')) {
+                        document.querySelectorAll('.rz-dropdown-panel')
+                            .forEach(p => p.style.display = 'none');
+                    }
+                });
+            ");
+        }
+    }
+
+    private Task OnValueChanged(string value)
+    {
+        SelectedDeploymentId = value;
+        return SelectedDeploymentIdChanged.InvokeAsync(value);
+    }
+
     private async Task OnChange(object? value)
     {
         var id = value?.ToString() ?? string.Empty;
-        SelectedDeploymentId = id;
-        await SelectedDeploymentIdChanged.InvokeAsync(id);
+        await OnValueChanged(id);
+
+        // Close the dropdown panel after selection
+        await JS.InvokeVoidAsync("eval", @"
+            document.querySelectorAll('.rz-dropdown-panel')
+                .forEach(p => p.style.display = 'none');
+            document.activeElement?.blur();
+        ");
     }
 }
