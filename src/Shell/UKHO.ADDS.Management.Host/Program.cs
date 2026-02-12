@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -63,6 +64,8 @@ public class Program
         builder.Services.AddOutputCache();
 
         builder.Services.AddHttpContextAccessor().AddTransient<AuthorizationHandler>();
+
+        builder.Services.AddTransient<IClaimsTransformation, KeycloakRealmRoleClaimsTransformation>();
 
         // Register the module configuration provider
         builder.Services.AddSingleton<IModuleConfigurationProvider, ModuleConfigurationProvider>();
