@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json;
+using System.Linq;
 using Microsoft.AspNetCore.Authentication;
 
 namespace UKHO.ADDS.Management.Host.Extensions;
@@ -7,6 +8,7 @@ namespace UKHO.ADDS.Management.Host.Extensions;
 public sealed class KeycloakRealmRoleClaimsTransformation : IClaimsTransformation
 {
     private const string RealmAccessClaimType = "realm_access";
+    private const string RolesClaimType = "roles";
 
     public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
@@ -17,28 +19,40 @@ public sealed class KeycloakRealmRoleClaimsTransformation : IClaimsTransformatio
             return Task.FromResult(principal);
         }
 
-        if (identity.HasClaim(c => c.Type == ClaimTypes.Role))
-        {
-            return Task.FromResult(principal);
-        }
-
-        var realmAccess = identity.FindFirst(RealmAccessClaimType)?.Value;
-        if (string.IsNullOrWhiteSpace(realmAccess))
-        {
-            return Task.FromResult(principal);
-        }
-
-        if (!TryReadRealmRoles(realmAccess, out var roles))
+        if (!TryGetRoles(identity, out var roles))
         {
             return Task.FromResult(principal);
         }
 
         foreach (var role in roles)
         {
-            identity.AddClaim(new Claim(ClaimTypes.Role, role));
+            if (!identity.HasClaim(ClaimTypes.Role, role))
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
         }
 
         return Task.FromResult(principal);
+    }
+
+    private static bool TryGetRoles(ClaimsIdentity identity, out IReadOnlyList<string> roles)
+    {
+        roles = Array.Empty<string>();
+
+        var flatRoles = identity.FindAll(RolesClaimType).Select(c => c.Value).Where(v => !string.IsNullOrWhiteSpace(v)).ToArray();
+        if (flatRoles.Length > 0)
+        {
+            roles = flatRoles;
+            return true;
+        }
+
+        var realmAccess = identity.FindFirst(RealmAccessClaimType)?.Value;
+        if (string.IsNullOrWhiteSpace(realmAccess))
+        {
+            return false;
+        }
+
+        return TryReadRealmRoles(realmAccess, out roles);
     }
 
     private static bool TryReadRealmRoles(string realmAccessJson, out IReadOnlyList<string> roles)
