@@ -155,6 +155,12 @@ These roles are used as examples/demonstrators in the current codebase:
 - `showsamplebutton`
   - Used to hide/show a button within the secure sample page.
 
+- `fileshareuser`
+  - Used to gate the File Share module navigation entry (`/fileshare`).
+
+- `permitserviceuser`
+  - Used to gate the Permit module navigation entry (`/permit`).
+
 See:
 - `docs/002-Modules-And-Shell-Enhancements/sample-module-rbac-ui-spec.md`
 
