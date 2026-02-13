@@ -122,6 +122,10 @@ public class Program
         app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
         app.MapRazorPages();
 
+        // Redirect unknown deep links (for example, a user pasting `/permit`) back to the shell home page.
+        // This avoids returning a raw server 404 without requiring an `_Host` Razor Page.
+        app.MapFallback(() => Results.Redirect("/", permanent: false));
+
         app.MapDefaultEndpoints();
 
         app.Run();
