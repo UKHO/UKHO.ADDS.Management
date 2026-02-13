@@ -95,6 +95,7 @@
 @code {
     private const string ModuleId = "Samples";
     private const string ModuleAssemblyName = "UKHO.ADDS.Management.Modules.Samples";
+    private const string DefaultDeploymentId = "Dev";
 
     private RadzenSidebar _sidebar0;
     private RadzenBody _body0;
@@ -151,18 +152,19 @@
             return;
         }
 
+        var defaultDeployment = _deployments.FirstOrDefault(d => string.Equals(d.Id, DefaultDeploymentId, StringComparison.Ordinal));
         var firstValid = _deployments.FirstOrDefault(d => !string.IsNullOrWhiteSpace(d.Id));
-        if (firstValid is null)
+        if (defaultDeployment is null && firstValid is null)
         {
             Logger.LogWarning("ShellLayout: deployments loaded ({Count}) but none had a valid 'id'", _deployments.Count());
             _selectedDeploymentId = string.Empty;
             return;
         }
 
-        _selectedDeploymentId = firstValid.Id;
+        _selectedDeploymentId = defaultDeployment?.Id ?? firstValid!.Id;
         DeploymentContext.SetSelectedDeploymentId(_selectedDeploymentId);
         Logger.LogInformation(
-            "ShellLayout: deployments loaded ({Count}); defaulting selection to '{Selected}'",
+            "ShellLayout: deployments loaded ({Count}); initial selection is '{Selected}'",
             _deployments.Count(),
             _selectedDeploymentId);
     }
@@ -211,9 +213,10 @@
             "console.debug",
             $"ShellLayout: stored selection for module '{ModuleId}' is '{stored}'");
 
+        var devDeployment = _deployments.FirstOrDefault(d => string.Equals(d.Id, DefaultDeploymentId, StringComparison.Ordinal));
         var selected = !string.IsNullOrWhiteSpace(stored) && _deployments.Any(d => d.Id == stored)
             ? stored!
-            : _deployments.First(d => !string.IsNullOrWhiteSpace(d.Id)).Id;
+            : devDeployment?.Id ?? _deployments.First(d => !string.IsNullOrWhiteSpace(d.Id)).Id;
 
         if (!string.Equals(_selectedDeploymentId, selected, StringComparison.Ordinal))
         {

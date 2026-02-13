@@ -24,11 +24,11 @@ Be concise but complete. Prefer current research (Microsoft Learn) for Microsoft
 
 ## Detailed Topic Guides
 Refer to specialized instruction files for full detail:
-- Architecture: `.github/copilot/copilot-instructions.architecture.md`
-- Frontend (Blazor/UI): `.github/copilot/copilot-instructions.frontend.md`
-- Backend (APIs/Services): `.github/copilot/copilot-instructions.backend.md`
-- Testing: `.github/copilot/copilot-instructions.testing.md`
-- Documentation Authoring: `.github/copilot/copilot-instructions.documentation.md`
-- Coding Standards: `.github/copilot/copilot-instructions.coding-standards.md`
+- Architecture: `.github/instructions/architecture.instructions.md`
+- Frontend (Blazor/UI): `.github/instructions/frontend.instructions.md`
+- Backend (APIs/Services): `.github/instructions/backend.instructions.md`
+- Testing: `.github/instructions/testing.instructions.md`
+- Documentation Authoring: `.github/instructions/documentation.instructions.md`
+- Coding Standards: `.github/instructions/coding-standards.instructions.md`
 
 All original guidance now resides in one of these files. Do not duplicate; update the relevant file when changing practices.
