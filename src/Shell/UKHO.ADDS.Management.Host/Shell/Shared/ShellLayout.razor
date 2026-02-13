@@ -25,15 +25,14 @@
                 <RadzenColumn Size="5">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                         <RadzenSidebarToggle Click="@(() => _sidebarExpanded = !_sidebarExpanded)" />
-                        <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">UKHO ADDS Mock Dashboard</span>
+                        <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">ADDS Management</span>
                     </RadzenStack>
                 </RadzenColumn>
                 <RadzenColumn Size="7">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
                         <div class="align-items-center" style="display: inline-flex; gap: 0.5rem;">
                             <DeploymentSelector Deployments="_deployments"
-                                                SelectedDeploymentId="_selectedDeploymentId"
-                                                SelectedDeploymentIdChanged="OnSelectedDeploymentIdChanged" />
+                                                @bind-SelectedDeploymentId="SelectedDeploymentId" />
 
                             <RadzenButton Text="Logout"
                                           Class="rz-text-nowrap rz-mx-2 rz-mx-lg-4"
@@ -106,6 +105,22 @@
 
     private IEnumerable<DeploymentRef> _deployments = Enumerable.Empty<DeploymentRef>();
     private string _selectedDeploymentId = string.Empty;
+    private string SelectedDeploymentId
+    {
+        get => _selectedDeploymentId;
+        set
+        {
+            if (string.Equals(_selectedDeploymentId, value, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _selectedDeploymentId = value;
+            DeploymentContext.SetSelectedDeploymentId(_selectedDeploymentId);
+
+            _ = SelectionStorage.SetAsync(ModuleId, _selectedDeploymentId);
+        }
+    }
     private bool _deploymentSelectionInitialized;
 
     protected override void OnInitialized()
@@ -161,19 +176,11 @@
             return;
         }
 
-        _selectedDeploymentId = defaultDeployment?.Id ?? firstValid!.Id;
-        DeploymentContext.SetSelectedDeploymentId(_selectedDeploymentId);
+        SelectedDeploymentId = defaultDeployment?.Id ?? firstValid!.Id;
         Logger.LogInformation(
             "ShellLayout: deployments loaded ({Count}); initial selection is '{Selected}'",
             _deployments.Count(),
             _selectedDeploymentId);
-    }
-
-    private async Task OnSelectedDeploymentIdChanged(string deploymentId)
-    {
-        _selectedDeploymentId = deploymentId;
-        DeploymentContext.SetSelectedDeploymentId(_selectedDeploymentId);
-        await SelectionStorage.SetAsync(ModuleId, _selectedDeploymentId);
     }
 
     private void OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
@@ -220,8 +227,7 @@
 
         if (!string.Equals(_selectedDeploymentId, selected, StringComparison.Ordinal))
         {
-            _selectedDeploymentId = selected;
-            DeploymentContext.SetSelectedDeploymentId(_selectedDeploymentId);
+            SelectedDeploymentId = selected;
             await JS.InvokeVoidAsync(
                 "console.debug",
                 $"ShellLayout: applying stored selection '{_selectedDeploymentId}'");
