@@ -1,0 +1,196 @@
+# Implementation Plan
+
+Based on:
+- `docs/003-basic-security-completion/spec-overview-basic-security-completion_v0.01.md`
+- `docs/003-basic-security-completion/spec-shell-ui-security-diagnostics_v0.01.md`
+
+## Work Package Structure
+- All documents for this work package live under `docs/003-basic-security-completion/`.
+
+## Slice 1: Authentication-time deployment default (Dev)
+- [ ] Work Item 1: Default deployment selection to `Dev` on first authentication
+  - **Purpose**: Ensure a consistent authenticated user experience by selecting `Dev` by default immediately after login.
+  - **Acceptance Criteria**:
+    - On first authenticated session, selected deployment is set to deployment with `id == "Dev"`.
+    - Header deployment dropdown reflects `Dev` as selected.
+    - Defaulting is applied once on login/auth transition, not enforced repeatedly on every refresh.
+    - If deployments are loaded, `Dev` is always chosen as the default selection.
+  - **Definition of Done**:
+    - Default selection logic implemented in the shell UI in the authentication transition path.
+    - Automated tests added/updated for default selection behaviour.
+    - Logging and error handling included (non-fatal if unavailable; fall back predictably).
+    - Documentation updated in this work package folder if behaviour differs from spec.
+    - Can execute end-to-end via: run host, login, observe `Dev` selected in header.
+  - [ ] Task 1: Identify the shell authentication transition hook
+    - [ ] Step 1: Locate where the app detects “user became authenticated” (e.g., auth state provider subscription / initialisation flow).
+    - [ ] Step 2: Confirm existing deployment selection pipeline (`DeploymentsJsonLoader`, `DeploymentSelectionStorage`, `DeploymentContext`).
+    - [ ] Step 3: Determine where to place “set default once” logic (startup, scoped service, or layout initialisation) without repeated enforcement.
+  - [ ] Task 2: Implement “default to Dev once per authenticated session”
+    - [ ] Step 1: Load deployments (if not already loaded at that point) and select the deployment where `id == "Dev"`.
+    - [ ] Step 2: Persist selection via existing storage abstraction.
+    - [ ] Step 3: Ensure `DeploymentContext` and header selector update to reflect persisted selection.
+    - [ ] Step 4: Add guard so this runs only on first auth transition (e.g., “has defaulted” flag stored in session scoped state).
+  - [ ] Task 3: Add tests for default selection behaviour
+    - [ ] Step 1: Add unit tests for selection logic (prefer service-level tests over component-only tests).
+    - [ ] Step 2: Add Playwright end-to-end test to verify the header dropdown reflects `Dev` after login.
+    - [ ] Step 3: Add a second Playwright test to verify selection is not forcibly reset on navigation/refresh.
+  - **Files**:
+    - `src/**/DeploymentsJsonLoader.*`: ensure Dev present/handling aligns with FR3.
+    - `src/**/DeploymentSelectionStorage.*`: persist “selected deployment” and optionally a “has defaulted” marker.
+    - `src/**/DeploymentContext.*`: ensure selection becomes current for downstream services.
+    - `src/**/Header*.razor`: confirm UI reflects selection.
+    - `tests/**`: new/updated tests.
+  - **Work Item Dependencies**: None.
+  - **Run / Verification Instructions**:
+    - Run the host project (local Aspire if used by solution).
+    - Login via OIDC.
+    - Confirm the header deployment dropdown defaults to `Dev`.
+    - Navigate to another page and refresh: confirm selection remains stable and is not forcibly reset.
+  - **User Instructions**:
+    - Ensure `Dev` deployment exists in the deployments source JSON used locally.
+
+## Slice 2: Developer module rename + role gating
+- [ ] Work Item 2: Rename Sample module to Developer module and role-gate to `developer`
+  - **Purpose**: Provide a secure, role-scoped area for developer-only tooling.
+  - **Acceptance Criteria**:
+    - Sample module is renamed to Developer module.
+    - The module `.csproj` is renamed accordingly.
+    - Navigation entries for this module only appear for users with the `developer` role.
+    - All pages/routes in the Developer module require `developer` role.
+  - **Definition of Done**:
+    - Project rename completed and references updated.
+    - Authorization enforced with `[Authorize(Roles = "developer")]` across the module.
+    - Navigation filtering aligns with module gating.
+    - Tests updated for role gating and navigation visibility.
+    - Can execute end-to-end via: login as developer, see Developer module; login as non-developer, do not.
+  - [ ] Task 1: Rename the module project and namespaces
+    - [ ] Step 1: Locate current Sample module project and decide new project name (e.g., `UKHO.ADDS.Management.Developer`).
+    - [ ] Step 2: Rename `.csproj` file and update solution/project references.
+    - [ ] Step 3: Update root namespaces and assembly names if required by conventions.
+    - [ ] Step 4: Update any module registration/discovery (DI, navigation registry, manifest).
+  - [ ] Task 2: Enforce `developer` role across module pages
+    - [ ] Step 1: Add `[Authorize(Roles = "developer")]` to a shared base layout/page route root (or to each page), matching the module’s patterns.
+    - [ ] Step 2: Ensure any module API calls (if present) are also protected appropriately (defense in depth).
+  - [ ] Task 3: Update module navigation filtering
+    - [ ] Step 1: Locate `ModulePageService` filtering logic.
+    - [ ] Step 2: Ensure the Developer module pages/entries are only emitted when current user has `developer` role.
+  - [ ] Task 4: Add/adjust tests
+    - [ ] Step 1: Unit test role filtering behaviour for module pages.
+    - [ ] Step 2: Add Playwright end-to-end test for visibility of Developer navigation entry (developer vs non-developer accounts).
+  - **Files**:
+    - `src/**/Sample/*.csproj` (rename)
+    - `src/**/Sample/**` (namespace/usings/registration updates)
+    - `src/**/ModulePageService.*`
+    - `src/**/Navigation*` / module registration files
+    - `tests/**`
+  - **Work Item Dependencies**: Work Item 1 recommended first.
+  - **Run / Verification Instructions**:
+    - Run host.
+    - Login as user without `developer` role: confirm no Developer module entries.
+    - Login as user with `developer` role: confirm Developer module entries appear and routes load.
+  - **User Instructions**:
+    - Ensure Keycloak role mapping yields a role claim with value `developer`.
+
+## Slice 3: Development diagnostics page (developer role)
+- [ ] Work Item 3: Implement `Development` diagnostics page inside Developer module
+  - **Purpose**: Provide development-only diagnostics for debugging authentication/role issues.
+  - **Acceptance Criteria**:
+    - `Development` page exists and is accessible only to users with `developer` role.
+    - Existing roles/claims diagnostics currently shown on Home are moved to `Development`.
+    - Home page no longer displays debug/auth diagnostic information.
+  - **Definition of Done**:
+    - New page created in Developer module.
+    - Gated by role.
+    - Home page cleaned up.
+    - Tests verifying diagnostics are not available without the `developer` role.
+    - Can execute end-to-end via: run host, login as developer, open `Development` page.
+  - [ ] Task 1: Create the `Development` page in the Developer module
+    - [ ] Step 1: Add a new Razor component page route (e.g., `/developer/development`).
+    - [ ] Step 2: Apply `[Authorize(Roles = "developer")]`.
+  - [ ] Task 2: Move diagnostics UI from Home to `Development`
+    - [ ] Step 1: Identify existing debug/auth diagnostics component/markup on Home.
+    - [ ] Step 2: Extract into a reusable component or shared service if needed.
+    - [ ] Step 3: Render it on the `Development` page.
+    - [ ] Step 4: Remove from Home.
+  - [ ] Task 3: Add navigation to `Development` page
+    - [ ] Step 1: Add Developer module navigation entry for `Development` page.
+  - [ ] Task 4: Add tests (role gating)
+    - [ ] Step 1: Unit test role gating logic.
+    - [ ] Step 2: Add Playwright end-to-end test that `Development` route is inaccessible to users without `developer` role.
+    - [ ] Step 3: Add Playwright end-to-end test that `Development` route is accessible to users with `developer` role.
+  - **Files**:
+    - `src/**/Developer/Pages/Development.razor` (new)
+    - `src/**/Home.razor` (remove diagnostics)
+    - `src/**/Developer/**` (navigation entry)
+    - `tests/**`
+  - **Work Item Dependencies**: Work Item 2.
+  - **Run / Verification Instructions**:
+    - Run host.
+    - Login as developer.
+    - Navigate to Developer -> Development.
+    - Confirm roles/claims visible there.
+    - Login as non-developer: confirm the route is not accessible and the nav entry is not visible.
+
+## Slice 4: Unauthorized / unknown URL safe redirect to Home
+- [ ] Work Item 4: Redirect unauthorized direct URL access and unknown routes to Home (`/`)
+  - **Purpose**: Avoid dead-ends and ensure predictable navigation outcomes.
+  - **Acceptance Criteria**:
+    - Unauthorized direct URL access redirects to `/`.
+    - Unknown routes redirect to `/`.
+    - No generic browser “page can’t be found” experience is presented.
+  - **Definition of Done**:
+    - Router configured to handle NotFound and NotAuthorized by redirecting to `/`.
+    - Behaviour applies to all module pages protected by roles/authorization.
+    - Tests added to validate router outcomes.
+    - Can execute end-to-end via: paste unauthorized URL and observe redirect.
+  - [ ] Task 1: Implement NotFound redirect
+    - [ ] Step 1: Locate the Blazor router setup (`App.razor` or equivalent).
+    - [ ] Step 2: In `<NotFound>`, navigate to `/` (or render a component that does so).
+  - [ ] Task 2: Implement NotAuthorized redirect
+    - [ ] Step 1: Locate `AuthorizeRouteView` usage.
+    - [ ] Step 2: Provide a `NotAuthorized` fragment that redirects to `/`.
+    - [ ] Step 3: Ensure no redirect loops (Home must always be accessible to authenticated users).
+  - [ ] Task 3: Add tests
+    - [ ] Step 1: Add Playwright end-to-end test verifying unknown route triggers redirect to `/`.
+    - [ ] Step 2: Add Playwright end-to-end test verifying unauthorized route triggers redirect to `/`.
+  - **Files**:
+    - `src/**/App.razor` (router)
+    - `src/**/Shared/**Redirect*.razor` (optional helper component)
+    - `tests/**`
+  - **Work Item Dependencies**: None.
+  - **Run / Verification Instructions**:
+    - Run host.
+    - Login as non-developer.
+    - Paste `Development` page URL: confirm redirect to `/`.
+    - Paste a random unknown URL: confirm redirect to `/`.
+
+## Slice 5: Regression coverage + documentation closure
+- [ ] Work Item 5: Add regression coverage and finalize documentation for WP003
+  - **Purpose**: Ensure baseline security behaviours remain stable and well understood.
+  - **Acceptance Criteria**:
+    - Automated tests cover FR1-FR7, FR10-FR14, FR15-FR19 at appropriate levels.
+    - Run instructions exist and are repeatable.
+    - Implementation decisions (e.g., redirect loops, environment gating technique) are captured.
+  - **Definition of Done**:
+    - Unit + integration/component tests passing.
+    - `dotnet build` passes.
+    - Docs updated within `docs/003-basic-security-completion/`.
+    - Can demonstrate all behaviours locally.
+  - [ ] Task 1: Add a manual end-to-end verification checklist
+    - [ ] Step 1: Document URLs, roles, and environment toggles for manual verification.
+    - [ ] Step 2: Document local setup requirements (Keycloak realm, test accounts) at a high level.
+  - [ ] Task 2: Validate safe failure modes
+    - [ ] Step 1: Confirm missing claims and unknown routes do not throw unhandled exceptions.
+    - [ ] Step 2: Confirm redirects are robust and do not loop.
+  - [ ] Task 3: Run full suite and capture evidence
+    - [ ] Step 1: Run build.
+    - [ ] Step 2: Run tests.
+  - **Files**:
+    - `docs/003-basic-security-completion/plan-basic-security-completion_v0.01.md` (update as needed)
+    - `docs/003-basic-security-completion/architecture-basic-security-completion_v0.01.md` (update as needed)
+    - `tests/**`
+  - **Work Item Dependencies**: Work Items 1-4.
+  - **Run / Verification Instructions**:
+    - `dotnet build`
+    - `dotnet test`
+    - Run Playwright tests (command depends on chosen harness; see test project readme if present).

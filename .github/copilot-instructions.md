@@ -1,6 +1,6 @@
 ﻿# Copilot Instructions (High-Level)
 
-You are an agent. Continue working until queries are fully resolved.
+You are an agent. Continue working until queries are fully resolved.  
 Be concise but complete. Prefer current research (Microsoft Learn) for Microsoft technologies.
 
 ## Quick Principles
@@ -19,6 +19,9 @@ Be concise but complete. Prefer current research (Microsoft Learn) for Microsoft
 - Do not overwrite prior work packages; create the next incremental folder (e.g. `002-...`).
 - Use appropriate prompt family & phase from `.github/prompts/`.
 
+## Testing Guidelines
+- Prefer Playwright end-to-end tests over bUnit/component tests for Blazor UI verification in this repository.
+
 ## Detailed Topic Guides
 Refer to specialized instruction files for full detail:
 - Architecture: `.github/copilot/copilot-instructions.architecture.md`
@@ -26,6 +29,6 @@ Refer to specialized instruction files for full detail:
 - Backend (APIs/Services): `.github/copilot/copilot-instructions.backend.md`
 - Testing: `.github/copilot/copilot-instructions.testing.md`
 - Documentation Authoring: `.github/copilot/copilot-instructions.documentation.md`
-- Codeing Standards: `.github/copilot/copilot-instructions.coding-standards.md`
+- Coding Standards: `.github/copilot/copilot-instructions.coding-standards.md`
 
 All original guidance now resides in one of these files. Do not duplicate; update the relevant file when changing practices.
